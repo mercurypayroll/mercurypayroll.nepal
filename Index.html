@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercury Payroll — All Modules</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#07050F;--bg2:#0F0B20;--surface:#1E1848;--gold:#F5A623;--violet:#7C3AED;--violet2:#A78BFA;--green:#10B981;--text:#F0EEFF;--text2:#C4B5FD;--text3:#7B6FB8;--border:rgba(124,58,237,0.2)}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;gap:14px}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#F5A623,#FCD34D);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#07050F}
+h1{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.sub{font-size:12px;color:var(--text3);margin-left:auto}
+.wrap{max-width:900px;margin:0 auto;padding:32px 24px}
+.hero{text-align:center;margin-bottom:40px}
+.hero h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,#F5A623,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{font-size:13px;color:var(--text3);line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.module-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;text-decoration:none;display:block;transition:all .2s}
+.module-card:hover{border-color:rgba(124,58,237,.4);transform:translateY(-3px);box-shadow:0 10px 30px rgba(124,58,237,.2)}
+.mc-icon{font-size:28px;margin-bottom:10px}
+.mc-num{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.mc-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
+.mc-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:10px}
+.mc-link{font-size:11px;color:var(--violet2);font-weight:600}
+.status-ready{display:inline-flex;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)}
+.status-full{display:inline-flex;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:rgba(245,166,35,.15);color:#FCD34D;border:1px solid rgba(245,166,35,.3)}
+.note{background:rgba(124,58,237,.06);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:24px;font-size:12px;color:var(--text2);line-height:1.7;text-align:center}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo-mark">M</div>
+  <h1>Mercury Payroll Pvt. Ltd.</h1>
+  <span class="sub">12 Modules · Nepal FY 2081/82 · Open any file in browser</span>
+</div>
+<div class="wrap">
+  <div class="hero">
+    <h2>All Mercury Payroll Modules</h2>
+    <p>Click any card to open that module. Files prefixed 01–13 are fully activated. <br>Simply open them directly in your browser — no server needed.</p>
+  </div>
+  <div class="grid">
+    <a href="01-payroll-software.html" class="module-card">
+      <div class="mc-icon">💰</div>
+      <div class="mc-num">Module 01</div>
+      <div class="mc-title">Core Payroll Software</div>
+      <div class="mc-desc">Full dashboard, employees, payroll runs, TDS, SSF, PF, attendance, reports</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="02-tds-wizard.html" class="module-card">
+      <div class="mc-icon">📄</div>
+      <div class="mc-num">Module 02</div>
+      <div class="mc-title">TDS Wizard</div>
+      <div class="mc-desc">5-step Nepal tax calculator with live slab detection, Kha 7 export</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="03-employee-portal.html" class="module-card">
+      <div class="mc-icon">👤</div>
+      <div class="mc-num">Module 03</div>
+      <div class="mc-title">Employee Self-Service</div>
+      <div class="mc-desc">Employee portal — payslips, leave, attendance calendar, documents</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="04-saas-dashboard.html" class="module-card">
+      <div class="mc-icon">🏢</div>
+      <div class="mc-num">Module 04</div>
+      <div class="mc-title">SaaS Super Admin</div>
+      <div class="mc-desc">Multi-company control panel, subscriptions, MRR, system health</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="05-attendance-import.html" class="module-card">
+      <div class="mc-icon">🖐️</div>
+      <div class="mc-num">Module 05</div>
+      <div class="mc-title">Attendance Import</div>
+      <div class="mc-desc">Biometric/CSV 5-phase import with column mapping and error resolution</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="06-onboarding.html" class="module-card">
+      <div class="mc-icon">🏗️</div>
+      <div class="mc-num">Module 06</div>
+      <div class="mc-title">Company Onboarding</div>
+      <div class="mc-desc">7-step wizard: profile, plan, departments, pay structure, compliance</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="07-payslip-generator.html" class="module-card">
+      <div class="mc-icon">🧾</div>
+      <div class="mc-num">Module 07</div>
+      <div class="mc-title">Bulk Payslip Generator</div>
+      <div class="mc-desc">Select employees, live preview, bulk PDF download, email sender</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="08-payment-gateway.html" class="module-card">
+      <div class="mc-icon">💳</div>
+      <div class="mc-num">Module 08</div>
+      <div class="mc-title">Payment Gateway</div>
+      <div class="mc-desc">eSewa, Khalti, NCHL bank transfers, OTP verification, transaction log</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="09-api-docs.html" class="module-card">
+      <div class="mc-icon">⚡</div>
+      <div class="mc-num">Module 09</div>
+      <div class="mc-title">API Documentation</div>
+      <div class="mc-desc">REST API docs — employees, payroll, TDS, SSF, webhooks, code samples</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="10-landing-website.html" class="module-card">
+      <div class="mc-icon">🌐</div>
+      <div class="mc-num">Module 10</div>
+      <div class="mc-title">Landing Website</div>
+      <div class="mc-desc">Marketing site with hero, features, pricing, Nepal compliance, testimonials</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="11-mobile-app.html" class="module-card">
+      <div class="mc-icon">📱</div>
+      <div class="mc-num">Module 11</div>
+      <div class="mc-title">Mobile App UI</div>
+      <div class="mc-desc">4 iOS/Android screens: Login, Dashboard, Pay Slip, Leave</div>
+      <span class="status-full">Full HTML ✓</span>
+    </a>
+    <a href="13-hosting-guide.html" class="module-card">
+      <div class="mc-icon">🚀</div>
+      <div class="mc-num">Guide</div>
+      <div class="mc-title">Hosting Guide</div>
+      <div class="mc-desc">Step-by-step: Vercel, GitHub Pages, VPS, .com.np domain, DNS setup</div>
+      <span class="status-ready">Guide ✓</span>
+    </a>
+  </div>
+  <div class="note">
+    💡 <strong>Open any file in your browser</strong> — double-click it. No server, no installation needed. All modules work offline.<br>
+    To deploy online: drag this entire folder to <strong>vercel.com</strong> → live in 60 seconds.
+  </div>
+</div>
+</body>
+</html>
