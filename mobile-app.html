@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercury Payroll — Mobile App UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0A0A14;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px}
+h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#E8E0FF;margin-bottom:6px;text-align:center}
+p.sub{font-size:12px;color:#6B60A0;margin-bottom:32px;text-align:center}
+.screens-row{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.phone{width:220px;background:#0F0C1E;border-radius:32px;border:2px solid rgba(124,58,237,.3);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.phone-notch{height:28px;background:#08061A;display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:1px solid rgba(124,58,237,.1)}
+.notch-dot{width:8px;height:8px;background:#1A1530;border-radius:50%}
+.notch-camera{width:6px;height:6px;background:#252040;border-radius:50%}
+.screen-label{font-size:11px;color:#6B60A0;text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+:root{--p:#7C3AED;--p2:#A78BFA;--gold:#F5A623;--green:#10B981;--red:#EF4444;--cyan:#06B6D4;--s0:#08061A;--s1:#0F0C28;--s2:#17143A;--s3:#1E1848;--t1:#F0EEFF;--t2:#C4B5FD;--t3:#7B6FB8}
+/* Login screen */
+.splash{background:linear-gradient(160deg,#0F0C28,#1A1240,#0F0C28);min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center}
+.splash-logo{width:52px;height:52px;background:linear-gradient(135deg,#F5A623,#FCD34D);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:#08061A;margin:0 auto 12px;box-shadow:0 8px 24px rgba(245,166,35,.3)}
+.splash h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#F0EEFF;margin-bottom:4px}
+.splash p{font-size:11px;color:#7B6FB8;margin-bottom:20px}
+.splash-input{width:100%;background:#1E1848;border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:9px 12px;color:#F0EEFF;font-size:12px;margin-bottom:8px;font-family:'DM Sans',sans-serif;outline:none}
+.splash-btn{width:100%;background:linear-gradient(135deg,#F5A623,#FCD34D);border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;color:#08061A;cursor:pointer;font-family:'DM Sans',sans-serif}
+/* App screen */
+.app-screen{background:var(--s0);min-height:340px}
+.app-header{background:var(--s1);padding:10px 12px 8px;border-bottom:1px solid rgba(124,58,237,.1)}
+.app-greeting{font-size:11px;color:var(--t3)}
+.app-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--t1)}
+.app-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--p),var(--p2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.app-body{padding:10px 12px}
+.salary-card{background:linear-gradient(135deg,#4C1D95,#6D28D9);border-radius:12px;padding:14px;margin-bottom:10px}
+.sc-label{font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px}
+.sc-amount{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;margin:4px 0}
+.sc-sub{font-size:9px;color:rgba(255,255,255,.5)}
+.sc-row{display:flex;gap:8px;margin-top:10px}
+.sc-box{flex:1;background:rgba(255,255,255,.1);border-radius:7px;padding:7px;text-align:center}
+.sc-box .v{font-size:12px;font-weight:700;color:#fff;font-family:'Syne',sans-serif}
+.sc-box .l{font-size:8px;color:rgba(255,255,255,.5);margin-top:1px}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.qb{background:var(--s2);border-radius:9px;padding:8px 4px;text-align:center;cursor:pointer}
+.qb-icon{font-size:16px;margin-bottom:3px}
+.qb-lbl{font-size:8px;color:var(--t3)}
+.mini-card{background:var(--s2);border-radius:9px;padding:10px;margin-bottom:7px}
+.mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.mc-title{font-size:10px;font-weight:600;color:var(--t2)}
+.mc-badge{font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600}
+.mc-green{background:rgba(16,185,129,.2);color:#34D399}
+.mc-amber{background:rgba(245,158,11,.2);color:#FCD34D}
+.mc-item{font-size:10px;color:var(--t3);display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(124,58,237,.08)}
+.mc-item:last-child{border-bottom:none}
+.mc-item strong{color:var(--t1);font-weight:500}
+.bottom-nav{display:flex;background:var(--s1);border-top:1px solid rgba(124,58,237,.15);padding:8px 0 10px}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.bn-icon{font-size:16px}
+.bn-lbl{font-size:8px;color:var(--t3)}
+.bn-item.active .bn-lbl{color:var(--p2)}
+.bn-dot{width:4px;height:4px;background:var(--p2);border-radius:50%;margin-top:1px}
+/* Payslip screen */
+.ps-header{background:linear-gradient(135deg,#312E81,#4C1D95);padding:12px;text-align:center}
+.ps-header h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.ps-net{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#FCD34D;margin:6px 0 2px}
+.ps-body{padding:10px 12px}
+.ps-section-title{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:8px 0 5px}
+.ps-row2{display:flex;justify-content:space-between;font-size:10px;padding:5px 0;border-bottom:1px solid rgba(124,58,237,.1)}
+.ps-row2 span{color:var(--t3)}
+.ps-row2 strong{color:var(--t1);font-weight:500}
+.ps-row2.ded strong{color:#F87171}
+.ps-total{background:var(--s2);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.ps-total span{font-size:10px;color:var(--t2);font-weight:600}
+.ps-total strong{font-family:'Syne',sans-serif;font-size:14px;color:var(--p2)}
+.ps-actions{display:flex;gap:6px;padding:0 12px 10px}
+.ps-btn{flex:1;padding:8px;border-radius:7px;font-size:10px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.psb-violet{background:var(--p);color:#fff}
+.psb-outline{background:transparent;color:var(--t2);border:1px solid rgba(124,58,237,.3)}
+/* Leave screen */
+.lv-header{background:var(--s1);padding:10px 12px;border-bottom:1px solid rgba(124,58,237,.1)}
+.lv-header h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--t1)}
+.lv-body{padding:10px 12px}
+.lv-bal-row{display:flex;gap:6px;margin-bottom:10px}
+.lv-bal{flex:1;background:var(--s2);border-radius:8px;padding:8px;text-align:center}
+.lv-bal .v{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--p2)}
+.lv-bal .l{font-size:8px;color:var(--t3);margin-top:1px}
+.lv-form{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.lv-input{background:var(--s2);border:1px solid rgba(124,58,237,.2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11px;font-family:'DM Sans',sans-serif;outline:none}
+.lv-select{background:var(--s2);border:1px solid rgba(124,58,237,.2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11px;outline:none;width:100%}
+.lv-select option{background:var(--s1)}
+.lv-submit{width:100%;background:linear-gradient(135deg,#7C3AED,#A78BFA);border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif}
+.lv-hist-item{background:var(--s2);border-radius:7px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.lh-left p{font-size:10px;font-weight:600;color:var(--t1)}
+.lh-left span{font-size:9px;color:var(--t3)}
+/* Attendance screen */
+.att-header{background:var(--s1);padding:10px 12px;border-bottom:1px solid rgba(124,58,237,.1)}
+.att-header h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--t1)}
+.att-body{padding:10px 12px}
+.att-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.att-stat{background:var(--s2);border-radius:8px;padding:8px;text-align:center}
+.att-stat .v{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.att-stat .l{font-size:8px;color:var(--t3);margin-top:1px}
+.att-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.att-day-label{font-size:8px;color:var(--t3);text-align:center;font-weight:600;padding:2px 0}
+.att-day{border-radius:4px;padding:4px 2px;text-align:center;font-size:9px;font-weight:500}
+.ad-p{background:rgba(16,185,129,.15);color:#34D399}
+.ad-l{background:rgba(245,158,11,.1);color:#FCD34D}
+.ad-h{background:rgba(79,70,229,.1);color:#A5B4FC}
+.ad-w{background:var(--s2);color:var(--t3)}
+.ad-e{background:transparent}
+</style>
+</head>
+<body>
+<h1>Mercury Payroll — Mobile App</h1>
+<p class="sub">Employee self-service · iOS &amp; Android · Nepal-first design · 5 screens</p>
+
+<div class="screens-row">
+
+  <!-- Screen 1: Login -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-dot"></div><div class="notch-camera"></div><div class="notch-dot"></div></div>
+      <div class="splash">
+        <div class="splash-logo">M</div>
+        <h2>Mercury Payroll</h2>
+        <p>Your payroll, anywhere in Nepal</p>
+        <input class="splash-input" type="text" value="aarav.sharma@techco.com.np" readonly>
+        <input class="splash-input" type="password" value="••••••••" readonly style="margin-bottom:16px">
+        <button class="splash-btn">Login to my account</button>
+        <p style="font-size:9px;color:#4A3F80;margin-top:10px">Forgot password? · Need help?</p>
+        <div style="margin-top:12px;font-size:9px;color:#4A3F80">Mercury Payroll v2.1.0 · Secured</div>
+      </div>
+    </div>
+    <div class="screen-label">Login</div>
+  </div>
+
+  <!-- Screen 2: Dashboard -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-dot"></div><div class="notch-camera"></div><div class="notch-dot"></div></div>
+      <div class="app-screen">
+        <div class="app-header">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div class="app-greeting">Good morning 👋</div><div class="app-name">Aarav Sharma</div></div>
+            <div class="app-avatar">AS</div>
+          </div>
+        </div>
+        <div class="app-body">
+          <div class="salary-card">
+            <div class="sc-label">Last net salary · Chaitra 2081</div>
+            <div class="sc-amount">NRs 87,100</div>
+            <div class="sc-sub">Credited: 2 Baisakh 2082 · NIC Asia Bank</div>
+            <div class="sc-row">
+              <div class="sc-box"><div class="v">NRs 1,08,000</div><div class="l">Gross</div></div>
+              <div class="sc-box"><div class="v">NRs 12,400</div><div class="l">TDS</div></div>
+              <div class="sc-box"><div class="v">25/26</div><div class="l">Present</div></div>
+            </div>
+          </div>
+          <div class="quick-grid">
+            <div class="qb"><div class="qb-icon">🧾</div><div class="qb-lbl">Payslip</div></div>
+            <div class="qb"><div class="qb-icon">📅</div><div class="qb-lbl">Leave</div></div>
+            <div class="qb"><div class="qb-icon">📊</div><div class="qb-lbl">Attend.</div></div>
+            <div class="qb"><div class="qb-icon">📄</div><div class="qb-lbl">Docs</div></div>
+          </div>
+          <div class="mini-card">
+            <div class="mc-top"><span class="mc-title">Leave balance</span><span class="mc-badge mc-green">FY 2081/82</span></div>
+            <div class="mc-item"><span>Annual leave</span><strong>14 days</strong></div>
+            <div class="mc-item"><span>Sick leave</span><strong>9 days</strong></div>
+            <div class="mc-item"><span>Emergency</span><strong>2 days</strong></div>
+          </div>
+          <div class="mini-card">
+            <div class="mc-top"><span class="mc-title">Pending action</span><span class="mc-badge mc-amber">1 item</span></div>
+            <div class="mc-item"><span>Leave (10–15 Baisakh)</span><strong style="color:#FCD34D">Pending</strong></div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="bn-item active"><div class="bn-icon">🏠</div><div class="bn-lbl">Home</div><div class="bn-dot"></div></div>
+          <div class="bn-item"><div class="bn-icon">💰</div><div class="bn-lbl">Pay</div></div>
+          <div class="bn-item"><div class="bn-icon">📅</div><div class="bn-lbl">Leave</div></div>
+          <div class="bn-item"><div class="bn-icon">📊</div><div class="bn-lbl">Attend.</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">Dashboard</div>
+  </div>
+
+  <!-- Screen 3: Pay Slip -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-dot"></div><div class="notch-camera"></div><div class="notch-dot"></div></div>
+      <div class="app-screen">
+        <div class="ps-header">
+          <h3>Pay Slip — Chaitra 2081</h3>
+          <p style="font-size:9px;color:rgba(255,255,255,.5)">Aarav Sharma · MPL-001 · PAN: 308-421-884</p>
+          <div class="ps-net">NRs 87,100</div>
+          <p style="font-size:9px;color:rgba(255,255,255,.4)">Net pay · NIC Asia Bank</p>
+        </div>
+        <div class="ps-body">
+          <div class="ps-section-title">Earnings</div>
+          <div class="ps-row2"><span>Basic salary</span><strong>NRs 85,000</strong></div>
+          <div class="ps-row2"><span>DA (12%)</span><strong>NRs 10,200</strong></div>
+          <div class="ps-row2"><span>HRA (8%)</span><strong>NRs 6,800</strong></div>
+          <div class="ps-row2"><span>Medical + Transport</span><strong>NRs 4,500</strong></div>
+          <div class="ps-section-title">Deductions</div>
+          <div class="ps-row2 ded"><span>SSF (11%)</span><strong>NRs 9,350</strong></div>
+          <div class="ps-row2 ded"><span>PF (10%)</span><strong>NRs 8,500</strong></div>
+          <div class="ps-row2 ded"><span>TDS (Income tax)</span><strong>NRs 12,400</strong></div>
+          <div class="ps-total"><span>NET PAY</span><strong>NRs 87,100</strong></div>
+        </div>
+        <div class="ps-actions">
+          <button class="ps-btn psb-violet">📥 Download PDF</button>
+          <button class="ps-btn psb-outline">📧 Email</button>
+        </div>
+        <div class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div><div class="bn-lbl">Home</div></div>
+          <div class="bn-item active"><div class="bn-icon">💰</div><div class="bn-lbl">Pay</div><div class="bn-dot"></div></div>
+          <div class="bn-item"><div class="bn-icon">📅</div><div class="bn-lbl">Leave</div></div>
+          <div class="bn-item"><div class="bn-icon">📊</div><div class="bn-lbl">Attend.</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">Pay Slip</div>
+  </div>
+
+  <!-- Screen 4: Leave -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-dot"></div><div class="notch-camera"></div><div class="notch-dot"></div></div>
+      <div class="app-screen">
+        <div class="lv-header"><h3>Leave Management</h3></div>
+        <div class="lv-body">
+          <div class="lv-bal-row">
+            <div class="lv-bal"><div class="v">14</div><div class="l">Annual</div></div>
+            <div class="lv-bal"><div class="v">9</div><div class="l">Sick</div></div>
+            <div class="lv-bal"><div class="v">2</div><div class="l">Emergency</div></div>
+          </div>
+          <div style="font-size:10px;color:#7B6FB8;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Apply for leave</div>
+          <div class="lv-form">
+            <select class="lv-select"><option>🌴 Annual Leave</option><option>🤒 Sick Leave</option><option>⚡ Emergency</option></select>
+            <input class="lv-input" type="text" value="From: 2082-01-10 (BS)" readonly>
+            <input class="lv-input" type="text" value="To: 2082-01-15 (BS)" readonly>
+            <input class="lv-input" type="text" placeholder="Reason for leave...">
+            <button class="lv-submit">Submit Request</button>
+          </div>
+          <div style="font-size:10px;color:#7B6FB8;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Recent requests</div>
+          <div class="lv-hist-item"><div class="lh-left"><p>Annual Leave · 6 days</p><span>10–15 Baisakh 2082</span></div><span style="font-size:9px;background:rgba(245,158,11,.2);color:#FCD34D;padding:2px 7px;border-radius:10px;font-weight:600">Pending</span></div>
+          <div class="lv-hist-item"><div class="lh-left"><p>Sick Leave · 1 day</p><span>26 Chaitra 2081</span></div><span style="font-size:9px;background:rgba(16,185,129,.2);color:#34D399;padding:2px 7px;border-radius:10px;font-weight:600">Approved</span></div>
+        </div>
+        <div class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div><div class="bn-lbl">Home</div></div>
+          <div class="bn-item"><div class="bn-icon">💰</div><div class="bn-lbl">Pay</div></div>
+          <div class="bn-item active"><div class="bn-icon">📅</div><div class="bn-lbl">Leave</div><div class="bn-dot"></div></div>
+          <div class="bn-item"><div class="bn-icon">📊</div><div class="bn-lbl">Attend.</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">Leave App</div>
+  </div>
+
+  <!-- Screen 5: Attendance -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-dot"></div><div class="notch-camera"></div><div class="notch-dot"></div></div>
+      <div class="app-screen">
+        <div class="att-header"><h3>My Attendance — Chaitra 2081</h3></div>
+        <div class="att-body">
+          <div class="att-stats">
+            <div class="att-stat"><div class="v" style="color:var(--green)">25</div><div class="l">Present</div></div>
+            <div class="att-stat"><div class="v" style="color:#FCD34D">1</div><div class="l">Leave</div></div>
+            <div class="att-stat"><div class="v" style="color:var(--p2)">8h</div><div class="l">Overtime</div></div>
+            <div class="att-stat"><div class="v" style="color:var(--cyan)">96.2%</div><div class="l">Rate</div></div>
+          </div>
+          <div style="font-size:10px;color:var(--t3);margin-bottom:6px;font-weight:600">Chaitra 2081 Calendar</div>
+          <div class="att-cal">
+            <div class="att-day-label">Su</div><div class="att-day-label">Mo</div><div class="att-day-label">Tu</div><div class="att-day-label">We</div><div class="att-day-label">Th</div><div class="att-day-label">Fr</div><div class="att-day-label">Sa</div>
+            <div class="att-day ad-e"></div><div class="att-day ad-e"></div><div class="att-day ad-e"></div><div class="att-day ad-p">1</div><div class="att-day ad-p">2</div><div class="att-day ad-p">3</div><div class="att-day ad-w">4</div>
+            <div class="att-day ad-p">5</div><div class="att-day ad-p">6</div><div class="att-day ad-p">7</div><div class="att-day ad-p">8</div><div class="att-day ad-p">9</div><div class="att-day ad-p">10</div><div class="att-day ad-w">11</div>
+            <div class="att-day ad-p">12</div><div class="att-day ad-p">13</div><div class="att-day ad-p">14</div><div class="att-day ad-h">15</div><div class="att-day ad-p">16</div><div class="att-day ad-p">17</div><div class="att-day ad-w">18</div>
+            <div class="att-day ad-p">19</div><div class="att-day ad-p">20</div><div class="att-day ad-p">21</div><div class="att-day ad-p">22</div><div class="att-day ad-p">23</div><div class="att-day ad-p">24</div><div class="att-day ad-w">25</div>
+            <div class="att-day ad-l">26</div><div class="att-day ad-p">27</div><div class="att-day ad-p">28</div><div class="att-day ad-p">29</div><div class="att-day ad-p">30</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <span style="font-size:9px;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:rgba(16,185,129,.3);border-radius:2px;display:inline-block"></span>Present</span>
+            <span style="font-size:9px;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:rgba(245,158,11,.2);border-radius:2px;display:inline-block"></span>Leave</span>
+            <span style="font-size:9px;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:rgba(79,70,229,.2);border-radius:2px;display:inline-block"></span>Holiday</span>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div><div class="bn-lbl">Home</div></div>
+          <div class="bn-item"><div class="bn-icon">💰</div><div class="bn-lbl">Pay</div></div>
+          <div class="bn-item"><div class="bn-icon">📅</div><div class="bn-lbl">Leave</div></div>
+          <div class="bn-item active"><div class="bn-icon">📊</div><div class="bn-lbl">Attend.</div><div class="bn-dot"></div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="screen-label">Attendance</div>
+  </div>
+
+</div>
+</body>
+</html>

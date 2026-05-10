@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercury Payroll — Bulk Payslip Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0A0614;--bg2:#100C20;--bg3:#17132E;--surface:#1E1840;--violet:#7C3AED;--violet2:#A78BFA;--gold:#F5A623;--gold2:#FCD34D;--green:#10B981;--red:#EF4444;--text:#F0EAFF;--text2:#B8ADEC;--text3:#6B60A0;--border:rgba(124,58,237,0.18);--border2:rgba(124,58,237,0.38)}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:100vh}
+.left-panel{padding:22px 24px;border-right:1px solid var(--border);overflow-y:auto}
+.right-panel{background:var(--bg2);padding:22px 20px;overflow-y:auto}
+.panel-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.panel-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.pi-violet{background:rgba(124,58,237,.25)}.pi-gold{background:rgba(245,166,35,.25)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:700;color:var(--violet2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-select{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text2);font-size:11px;outline:none;font-family:'DM Sans',sans-serif}
+.filter-select option{background:var(--bg2)}
+.search-box{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:11px;outline:none;font-family:'DM Sans',sans-serif;min-width:120px}
+.search-box:focus,.filter-select:focus{border-color:var(--violet2)}
+.emp-table-wrap{overflow-x:auto;border-radius:8px;max-height:280px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{background:var(--bg3);color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+tbody tr:hover{background:var(--surface)}
+tbody tr.sel{background:rgba(124,58,237,.1);border-left:2px solid var(--violet2)}
+td{padding:8px 10px;color:var(--text2)}
+td:first-child{color:var(--text);font-weight:500}
+.cb{width:14px;height:14px;cursor:pointer;accent-color:var(--violet)}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700}
+.b-green{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)}
+.b-amber{background:rgba(245,158,11,.15);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.b-violet{background:rgba(124,58,237,.15);color:#A78BFA;border:1px solid rgba(124,58,237,.3)}
+.sel-bar{display:flex;align-items:center;justify-content:space-between;background:rgba(124,58,237,.1);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;margin-bottom:10px}
+.sel-bar p{font-size:11px;color:var(--violet2);font-weight:600}
+.sel-bar span{font-size:10px;color:var(--text3)}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.action-btn{padding:10px 14px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;gap:7px;justify-content:center}
+.ab-violet{background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff}
+.ab-violet:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(124,58,237,.3)}
+.ab-gold{background:linear-gradient(135deg,#F5A623,#FCD34D);color:#0A0614}
+.ab-gold:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,166,35,.3)}
+.ab-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.ab-outline:hover{background:var(--surface)}
+.ab-green{background:linear-gradient(135deg,#10B981,#34D399);color:#fff}
+.ab-green:hover{transform:translateY(-1px)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row label{font-size:12px;color:var(--text2)}
+.toggle{width:34px;height:18px;background:var(--surface);border-radius:18px;cursor:pointer;transition:background .2s;flex-shrink:0;position:relative}
+.toggle.on{background:var(--violet)}
+.toggle::after{content:'';width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s}
+.toggle.on::after{left:18px}
+.preview-wrap{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:18px;font-size:11px}
+.ps-logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;background:linear-gradient(135deg,#F5A623,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ps-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.ps-section h4{font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:7px}
+.ps-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(124,58,237,.08);font-size:10px}
+.ps-row span{color:var(--text3)}
+.ps-row strong{color:var(--text);font-weight:600}
+.ps-net{background:linear-gradient(135deg,#7C3AED,#A78BFA);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.ps-net span{color:rgba(255,255,255,.8);font-size:11px;font-weight:600}
+.ps-net strong{color:#fff;font-size:16px;font-weight:800;font-family:'Syne',sans-serif}
+.prog-section{display:none}.prog-section.active{display:block}
+.progress-bar{height:6px;background:var(--surface);border-radius:3px;overflow:hidden;margin:8px 0}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA);transition:width .3s}
+.log-item{font-size:10px;color:var(--text3);padding:3px 0;display:flex;align-items:center;gap:6px}
+.log-item.done{color:var(--green)}.log-item.active-log{color:var(--violet2)}.log-item.err{color:var(--red)}
+.log-item{display:flex;align-items:center;gap:6px}
+.email-log{display:flex;flex-direction:column;gap:4px}
+</style>
+</head>
+<body>
+<div class="layout">
+<div class="left-panel">
+  <div class="panel-title"><div class="panel-icon pi-violet">💰</div>Bulk Payslip Generator</div>
+  <div class="card">
+    <div class="card-title">Payroll period &amp; filters</div>
+    <div class="filter-row">
+      <select class="filter-select"><option>Chaitra 2081</option><option>Falgun 2081</option><option>Magh 2081</option></select>
+      <select class="filter-select"><option>All departments</option><option>Technology</option><option>Finance</option><option>Operations</option><option>HR &amp; Admin</option></select>
+      <select class="filter-select"><option>All status</option><option>Active</option><option>Probation</option></select>
+      <input class="search-box" type="text" placeholder="🔍 Search employee...">
+    </div>
+    <div class="sel-bar">
+      <div><p id="sel-count">5 of 7 selected</p><span>Click rows or use checkboxes</span></div>
+      <div style="display:flex;gap:6px">
+        <button class="action-btn ab-outline" style="padding:5px 10px;font-size:10px" onclick="selectAll()">Select all</button>
+        <button class="action-btn ab-outline" style="padding:5px 10px;font-size:10px" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+    <div class="emp-table-wrap">
+      <table><thead><tr><th><input type="checkbox" class="cb" id="check-all" onchange="toggleAll(this)"></th><th>Employee</th><th>Dept</th><th>Gross</th><th>Net pay</th><th>Status</th></tr></thead>
+      <tbody id="emp-tbody"></tbody></table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Output options</div>
+    <div class="toggle-row"><label>Include company letterhead</label><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><label>Show SSF employer contribution</label><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><label>Show YTD totals</label><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><label>Password-protect PDFs</label><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><label>Include QR code</label><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Email options</div>
+    <div class="toggle-row"><label>Send email to employees</label><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="toggle-row"><label>CC to HR manager</label><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <div style="margin-top:10px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Email subject</div>
+      <input type="text" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:11px;outline:none;font-family:'DM Sans',sans-serif" value="Your Payslip for Chaitra 2081 — Mercury Payroll">
+    </div>
+  </div>
+  <div class="action-grid">
+    <button class="action-btn ab-violet" onclick="startGenerate('preview')">👁 Preview payslips</button>
+    <button class="action-btn ab-gold" onclick="startGenerate('pdf')">📥 Download PDFs</button>
+    <button class="action-btn ab-green" onclick="startGenerate('email')">📧 Generate &amp; Email</button>
+    <button class="action-btn ab-outline" onclick="startGenerate('excel')">📊 Export summary</button>
+  </div>
+  <div class="prog-section card" id="prog-section">
+    <div class="card-title" id="prog-title">Generating payslips...</div>
+    <div class="progress-bar"><div class="prog-fill" id="main-prog" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:10px"><span id="prog-status">Starting...</span><span id="prog-pct">0%</span></div>
+    <div id="log-wrap" style="display:flex;flex-direction:column;gap:2px"></div>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="panel-title"><div class="panel-icon pi-gold">🧾</div>Live Payslip Preview</div>
+  <div style="margin-bottom:12px;display:flex;gap:6px;align-items:center">
+    <select class="filter-select" id="preview-select" onchange="renderPreview()" style="flex:1">
+      <option value="0">Aarav Sharma</option><option value="1">Priya Thapa</option><option value="2">Bikram Rai</option>
+      <option value="3">Sita Gurung</option><option value="4">Rohan Adhikari</option><option value="5">Anita Shrestha</option><option value="6">Ramesh Basnet</option>
+    </select>
+    <button class="action-btn ab-outline" style="padding:6px 10px;font-size:10px">← Prev</button>
+    <button class="action-btn ab-outline" style="padding:6px 10px;font-size:10px">Next →</button>
+  </div>
+  <div class="preview-wrap" id="payslip-preview"></div>
+  <div style="display:flex;gap:7px;margin-top:10px">
+    <button class="action-btn ab-violet" style="flex:1;font-size:11px">🖨 Print</button>
+    <button class="action-btn ab-outline" style="flex:1;font-size:11px">📥 PDF</button>
+    <button class="action-btn ab-outline" style="flex:1;font-size:11px">📧 Email</button>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-title">Email delivery log</div>
+    <div class="email-log">
+      <div class="log-item done">✅ aarav.sharma@techco.com.np — Delivered</div>
+      <div class="log-item done">✅ priya.thapa@techco.com.np — Delivered</div>
+      <div class="log-item done">✅ bikram.rai@techco.com.np — Delivered</div>
+      <div class="log-item err">❌ sita.gurung@techco.com.np — Invalid email</div>
+      <div class="log-item done">✅ rohan.adhikari@techco.com.np — Delivered</div>
+      <div class="log-item done">✅ anita.shrestha@techco.com.np — Delivered</div>
+      <div class="log-item done">✅ ramesh.basnet@techco.com.np — Delivered</div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+var employees=[
+  {name:'Aarav Sharma',dept:'Technology',basic:85000,da:10200,hra:6800,medical:2500,transport:2000,ssf:9350,pf:8500,tds:12400,email:'aarav.sharma@techco.com.np',status:'Active'},
+  {name:'Priya Thapa',dept:'Finance',basic:72000,da:8640,hra:5760,medical:2500,transport:2000,ssf:7920,pf:7200,tds:9200,email:'priya.thapa@techco.com.np',status:'Active'},
+  {name:'Bikram Rai',dept:'Operations',basic:68000,da:8160,hra:5440,medical:2500,transport:2000,ssf:7480,pf:6800,tds:7800,email:'bikram.rai@techco.com.np',status:'Active'},
+  {name:'Sita Gurung',dept:'HR & Admin',basic:45000,da:5400,hra:3600,medical:2500,transport:2000,ssf:4950,pf:4500,tds:2100,email:'sita.gurung@techco.com.np',status:'Probation'},
+  {name:'Rohan Adhikari',dept:'Sales',basic:38000,da:4560,hra:3040,medical:2500,transport:2000,ssf:4180,pf:3800,tds:1200,email:'rohan.adhikari@techco.com.np',status:'Active'},
+  {name:'Anita Shrestha',dept:'Technology',basic:92000,da:11040,hra:7360,medical:2500,transport:2000,ssf:10120,pf:9200,tds:14800,email:'anita.shrestha@techco.com.np',status:'Active'},
+  {name:'Ramesh Basnet',dept:'Finance',basic:55000,da:6600,hra:4400,medical:2500,transport:2000,ssf:6050,pf:5500,tds:3400,email:'ramesh.basnet@techco.com.np',status:'Active'}
+];
+var selected=new Set([0,1,2,3,4]);
+function gross(e){return e.basic+e.da+e.hra+e.medical+e.transport;}
+function net(e){return gross(e)-e.ssf-e.pf-e.tds;}
+function renderTable(){
+  document.getElementById('emp-tbody').innerHTML=employees.map(function(e,i){
+    return'<tr class="'+(selected.has(i)?'sel':'')+'" onclick="toggleRow('+i+')"><td><input type="checkbox" class="cb" '+(selected.has(i)?'checked':'')+' onclick="event.stopPropagation();toggleRow('+i+')"></td><td>'+e.name+'</td><td>'+e.dept+'</td><td>NRs '+gross(e).toLocaleString()+'</td><td>NRs '+net(e).toLocaleString()+'</td><td><span class="badge '+(e.status==='Active'?'b-green':'b-amber')+'">'+e.status+'</span></td></tr>';
+  }).join('');
+  document.getElementById('sel-count').textContent=selected.size+' of '+employees.length+' selected';
+}
+function toggleRow(i){selected.has(i)?selected.delete(i):selected.add(i);renderTable();}
+function selectAll(){employees.forEach(function(_,i){selected.add(i);});renderTable();}
+function clearAll(){selected.clear();renderTable();}
+function toggleAll(cb){cb.checked?selectAll():clearAll();}
+function renderPreview(){
+  var idx=parseInt(document.getElementById('preview-select').value);
+  var e=employees[idx],g=gross(e),n=net(e);
+  document.getElementById('payslip-preview').innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div class="ps-logo">Mercury Payroll Pvt. Ltd.</div><div style="font-size:9px;color:var(--text3);margin-top:2px">Kathmandu, Nepal · PAN: 605-XXX-XXX</div></div><div style="text-align:right"><div style="font-size:9px;color:var(--text3)">PAY SLIP</div><div style="font-size:11px;font-weight:700;color:var(--violet2)">Chaitra 2081</div></div></div>'+
+    '<hr class="ps-divider"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px"><span style="color:var(--text3)">Employee</span><strong>'+e.name+'</strong></div>'+
+    '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px"><span style="color:var(--text3)">Department</span><strong>'+e.dept+'</strong></div>'+
+    '<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px"><span style="color:var(--text3)">Working days</span><strong>26 / 26</strong></div>'+
+    '<hr class="ps-divider"><div class="ps-grid"><div class="ps-section"><h4>Earnings</h4>'+
+    '<div class="ps-row"><span>Basic salary</span><strong>NRs '+e.basic.toLocaleString()+'</strong></div>'+
+    '<div class="ps-row"><span>DA (12%)</span><strong>NRs '+e.da.toLocaleString()+'</strong></div>'+
+    '<div class="ps-row"><span>HRA (8%)</span><strong>NRs '+e.hra.toLocaleString()+'</strong></div>'+
+    '<div class="ps-row"><span>Medical</span><strong>NRs 2,500</strong></div>'+
+    '<div class="ps-row"><span>Transport</span><strong>NRs 2,000</strong></div>'+
+    '<div class="ps-row" style="border-top:1px solid var(--border2);margin-top:4px"><span style="font-weight:700">Gross</span><strong style="color:var(--green)">NRs '+g.toLocaleString()+'</strong></div></div>'+
+    '<div class="ps-section"><h4>Deductions</h4>'+
+    '<div class="ps-row"><span>SSF (11%)</span><strong style="color:var(--red)">NRs '+e.ssf.toLocaleString()+'</strong></div>'+
+    '<div class="ps-row"><span>PF (10%)</span><strong style="color:var(--red)">NRs '+e.pf.toLocaleString()+'</strong></div>'+
+    '<div class="ps-row"><span>TDS</span><strong style="color:var(--red)">NRs '+e.tds.toLocaleString()+'</strong></div>'+
+    '<div class="ps-row" style="border-top:1px solid var(--border2);margin-top:4px"><span style="font-weight:700">Total ded.</span><strong style="color:var(--red)">NRs '+(e.ssf+e.pf+e.tds).toLocaleString()+'</strong></div>'+
+    '<div style="margin-top:10px;background:rgba(124,58,237,.08);border-radius:6px;padding:6px 8px"><div style="font-size:9px;color:var(--text3);margin-bottom:2px">Employer SSF (20%)</div><div style="font-size:11px;font-weight:700;color:var(--violet2)">NRs '+Math.round(e.basic*.2).toLocaleString()+'</div></div></div></div>'+
+    '<div class="ps-net"><span>NET PAY — Chaitra 2081</span><strong>NRs '+n.toLocaleString()+'</strong></div>';
+}
+function startGenerate(type){
+  var prog=document.getElementById('prog-section');
+  prog.classList.add('active');
+  var labels={preview:'Rendering previews',pdf:'Generating PDFs',email:'Generating &amp; sending emails',excel:'Exporting summary'};
+  document.getElementById('prog-title').textContent=labels[type]+'...';
+  var fill=document.getElementById('main-prog'),status=document.getElementById('prog-status'),pct=document.getElementById('prog-pct'),log=document.getElementById('log-wrap');
+  var steps=type==='email'?['Validating employee records','Calculating payroll amounts','Generating PDF payslips','Connecting to email server','Sending payslips','Updating delivery log']:['Validating records','Calculating amounts','Formatting payslip layout','Compiling output files','Finalizing...'];
+  log.innerHTML=steps.map(function(s){return'<div class="log-item" id="lg-'+s.replace(/[^a-z]/gi,'_')+'">'+s+'</div>';}).join('');
+  var step=0,total=selected.size;
+  function next(){
+    if(step<steps.length){
+      var key='lg-'+steps[step].replace(/[^a-z]/gi,'_');
+      var el=document.getElementById(key);
+      if(el){el.className='log-item active-log';el.textContent='⟳ '+steps[step];}
+      setTimeout(function(){
+        if(el){el.className='log-item done';el.textContent='✅ '+steps[step];}
+        step++;
+        var p=Math.round((step/steps.length)*100);
+        fill.style.width=p+'%';pct.textContent=p+'%';
+        status.textContent=Math.min(total,Math.round((step/steps.length)*total))+' of '+total+' employees';
+        next();
+      },600+Math.random()*300);
+    }else{
+      status.textContent='✅ Done — '+total+' payslips '+(type==='email'?'sent':'generated');
+      document.getElementById('prog-title').textContent='✅ Complete!';
+    }
+  }
+  next();
+}
+renderTable();renderPreview();
+</script>
+</body>
+</html>

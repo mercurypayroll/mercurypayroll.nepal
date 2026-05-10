@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercury Payroll — Backend Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06080F;--bg2:#0C1018;--bg3:#111820;--surface:#182030;--surface2:#1E2A40;
+  --violet:#7C3AED;--violet2:#A78BFA;--cyan:#06B6D4;--cyan2:#67E8F9;
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--blue:#3B82F6;--gold:#F5A623;
+  --text:#E8F4FF;--text2:#94B8D0;--text3:#4A6A8A;
+  --border:rgba(6,182,212,0.15);--border2:rgba(6,182,212,0.35);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#06B6D4,#67E8F9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#06080F}
+.logo-text{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.tabs{display:flex;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.tab{padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text3);transition:all .2s}
+.tab.active{background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(103,232,249,.1));color:var(--cyan2)}
+.tab:hover:not(.active){background:var(--surface);color:var(--text2)}
+.content{padding:28px 32px}
+.panel{display:none}.panel.active{display:block}
+/* Diagram area */
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px;overflow-x:auto}
+.diagram-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.diagram-sub{font-size:13px;color:var(--text3);margin-bottom:24px}
+/* Architecture blocks */
+.arch-layer{margin-bottom:20px}
+.layer-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;padding:4px 12px;border-radius:20px;display:inline-block}
+.ll-client{background:rgba(124,58,237,.15);color:#A78BFA}
+.ll-gateway{background:rgba(6,182,212,.15);color:#67E8F9}
+.ll-services{background:rgba(245,158,11,.15);color:#FCD34D}
+.ll-data{background:rgba(16,185,129,.15);color:#34D399}
+.ll-external{background:rgba(239,68,68,.15);color:#F87171}
+.arch-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.arch-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-width:160px;flex:1;transition:all .2s;position:relative}
+.arch-box:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(6,182,212,.1)}
+.arch-box-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.arch-box-desc{font-size:11px;color:var(--text3);line-height:1.5}
+.arch-box-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.atag{font-size:9px;padding:2px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-weight:500}
+.at-cyan{background:rgba(6,182,212,.12);color:var(--cyan2)}
+.at-violet{background:rgba(124,58,237,.12);color:#A78BFA}
+.at-green{background:rgba(16,185,129,.12);color:#34D399}
+.at-amber{background:rgba(245,158,11,.12);color:#FCD34D}
+.at-red{background:rgba(239,68,68,.12);color:#F87171}
+.arch-arrow{text-align:center;font-size:18px;color:var(--border2);margin:4px 0;line-height:1}
+.arch-arrow-label{font-size:10px;color:var(--text3);text-align:center;margin-bottom:4px}
+/* Stack info */
+.stack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.stack-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px}
+.stack-icon{font-size:24px;margin-bottom:10px}
+.stack-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.stack-role{font-size:11px;color:var(--cyan2);font-weight:600;margin-bottom:6px}
+.stack-desc{font-size:11px;color:var(--text3);line-height:1.6}
+/* Multi-tenant diagram */
+.mt-wrap{display:flex;flex-direction:column;gap:0}
+.mt-row{display:flex;gap:16px;align-items:center;justify-content:center;margin-bottom:8px;flex-wrap:wrap}
+.mt-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 18px;text-align:center;min-width:140px;transition:all .2s}
+.mt-box:hover{border-color:var(--border2)}
+.mt-box-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px}
+.mt-box-sub{font-size:10px;color:var(--text3)}
+.mt-arrow{font-size:20px;color:var(--border2)}
+.mt-arrow-down{text-align:center;font-size:20px;color:var(--border2);margin:6px 0}
+.mt-db-main{background:linear-gradient(135deg,rgba(16,185,129,.08),var(--bg3));border:1px solid rgba(16,185,129,.3);border-radius:14px;padding:18px 24px;text-align:center;max-width:420px;margin:0 auto}
+.mt-db-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--green);margin-bottom:4px}
+.mt-db-sub{font-size:11px;color:var(--text3);margin-bottom:14px}
+.mt-tenants{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.mt-tenant{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;text-align:center;min-width:100px}
+.mt-tenant-name{font-size:11px;font-weight:600;color:var(--text)}
+.mt-tenant-sub{font-size:9px;color:var(--text3);margin-top:2px}
+.rls-badge{display:inline-block;background:rgba(245,158,11,.12);color:#FCD34D;font-size:10px;padding:2px 8px;border-radius:10px;font-family:'JetBrains Mono',monospace;margin-top:8px}
+/* API flow */
+.flow-steps{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:8px}
+.flow-step{display:flex;flex-direction:column;align-items:center;min-width:120px}
+.flow-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px;border:1px solid var(--border)}
+.flow-title{font-size:11px;font-weight:600;color:var(--text);text-align:center;margin-bottom:3px}
+.flow-desc{font-size:10px;color:var(--text3);text-align:center;line-height:1.4;max-width:100px}
+.flow-arrow{font-size:22px;color:var(--border2);margin:0 4px;align-self:center;padding-bottom:40px;flex-shrink:0}
+.fc-client{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3)}
+.fc-gateway{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3)}
+.fc-auth{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3)}
+.fc-service{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3)}
+.fc-db{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3)}
+.fc-response{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3)}
+/* Security section */
+.security-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
+.sec-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.sec-icon{font-size:24px;margin-bottom:8px}
+.sec-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text)}
+.sec-list{display:flex;flex-direction:column;gap:6px}
+.sec-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text2)}
+.sec-check{color:var(--green);flex-shrink:0;font-size:12px}
+/* Code blocks */
+.code-block{background:#0D1117;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;overflow-x:auto;margin:12px 0;color:#ABB2BF}
+.code-block pre{white-space:pre-wrap}
+.kw-string{color:#98C379}.kw-num{color:#D19A66}.kw-key{color:#E06C75}.kw-comment{color:#5C6370;font-style:italic}.kw-type{color:#56B6C2}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">M</div>
+    <span class="logo-text">Mercury Payroll — Backend Architecture</span>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('system',this)">🏗️ System layers</div>
+    <div class="tab" onclick="switchTab('multitenant',this)">🏢 Multi-tenancy</div>
+    <div class="tab" onclick="switchTab('apiflow',this)">⚡ API request flow</div>
+    <div class="tab" onclick="switchTab('stack',this)">🛠️ Tech stack</div>
+    <div class="tab" onclick="switchTab('security',this)">🔐 Security</div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- SYSTEM LAYERS -->
+<div class="panel active" id="tab-system">
+  <div class="diagram-wrap">
+    <div class="diagram-title">System Architecture — Mercury Payroll</div>
+    <div class="diagram-sub">4-layer architecture: Client → API Gateway → Microservices → Data. Hosted on DigitalOcean / AWS with Docker containers.</div>
+
+    <!-- Client Layer -->
+    <div class="arch-layer">
+      <span class="layer-label ll-client">Layer 1 — Client</span>
+      <div class="arch-row">
+        <div class="arch-box"><div class="arch-box-title">🌐 Web browser</div><div class="arch-box-desc">React SPA served via CDN. All API calls over HTTPS.</div><div class="arch-box-tags"><span class="atag at-cyan">React</span><span class="atag at-violet">HTTPS</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">📱 Mobile app</div><div class="arch-box-desc">React Native iOS & Android. JWT auth, offline support.</div><div class="arch-box-tags"><span class="atag at-cyan">React Native</span><span class="atag at-violet">JWT</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🔗 API consumers</div><div class="arch-box-desc">Third-party integrations — HRMS, biometric devices, banks.</div><div class="arch-box-tags"><span class="atag at-cyan">REST API</span><span class="atag at-amber">Webhooks</span></div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓</div>
+    <div class="arch-arrow-label">All traffic encrypted via HTTPS / TLS 1.3</div>
+
+    <!-- Gateway Layer -->
+    <div class="arch-layer">
+      <span class="layer-label ll-gateway">Layer 2 — API Gateway</span>
+      <div class="arch-row">
+        <div class="arch-box" style="flex:2"><div class="arch-box-title">🔀 API Gateway (Nginx + Kong)</div><div class="arch-box-desc">Single entry point for all requests. Handles authentication, rate limiting, request routing, load balancing, SSL termination, and request logging.</div><div class="arch-box-tags"><span class="atag at-cyan">Nginx</span><span class="atag at-cyan">Kong</span><span class="atag at-violet">JWT verify</span><span class="atag at-amber">Rate limit</span><span class="atag at-green">Load balance</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🔐 Auth service</div><div class="arch-box-desc">JWT generation, validation, refresh tokens, SSO, tenant isolation enforcement.</div><div class="arch-box-tags"><span class="atag at-violet">JWT</span><span class="atag at-amber">OAuth2</span><span class="atag at-green">RBAC</span></div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓</div>
+    <div class="arch-arrow-label">Internal service mesh — gRPC / REST</div>
+
+    <!-- Microservices Layer -->
+    <div class="arch-layer">
+      <span class="layer-label ll-services">Layer 3 — Microservices</span>
+      <div class="arch-row">
+        <div class="arch-box"><div class="arch-box-title">💰 Payroll engine</div><div class="arch-box-desc">Salary calculation, TDS (Nepal FY slabs), SSF/PF/CIT computation, payslip generation.</div><div class="arch-box-tags"><span class="atag at-amber">Node.js</span><span class="atag at-green">Nepal slabs</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">👥 HR service</div><div class="arch-box-desc">Employee CRUD, department management, leave workflow, document storage.</div><div class="arch-box-tags"><span class="atag at-amber">Node.js</span><span class="atag at-cyan">REST</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🏢 Tenant manager</div><div class="arch-box-desc">Company onboarding, plan management, tenant isolation, usage tracking.</div><div class="arch-box-tags"><span class="atag at-violet">Multi-tenant</span><span class="atag at-green">SaaS</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">📊 Report service</div><div class="arch-box-desc">PDF generation, Excel exports, IRD format reports, Kha 7 certificates.</div><div class="arch-box-tags"><span class="atag at-cyan">PDFKit</span><span class="atag at-amber">ExcelJS</span></div></div>
+      </div>
+      <div class="arch-row" style="margin-top:8px">
+        <div class="arch-box"><div class="arch-box-title">🗓️ Attendance service</div><div class="arch-box-desc">Biometric import, CSV parsing, conflict resolution, OT calculation.</div><div class="arch-box-tags"><span class="atag at-amber">Parser</span><span class="atag at-green">ZKTeco</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🔔 Notification service</div><div class="arch-box-desc">Email (SendGrid), SMS (Sparrow SMS Nepal), push notifications, deadline reminders.</div><div class="arch-box-tags"><span class="atag at-cyan">SendGrid</span><span class="atag at-violet">Sparrow</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">💳 Billing service</div><div class="arch-box-desc">Subscription management, payment processing, eSewa/Khalti/bank integrations.</div><div class="arch-box-tags"><span class="atag at-green">eSewa</span><span class="atag at-violet">Khalti</span><span class="atag at-cyan">NCHL</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">📋 Compliance service</div><div class="arch-box-desc">IRD TDS filing, SSF online integration, deadline tracking, audit trail.</div><div class="arch-box-tags"><span class="atag at-red">IRD API</span><span class="atag at-amber">SSF</span></div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓</div>
+    <div class="arch-arrow-label">Persistent data layer — PostgreSQL Row-Level Security</div>
+
+    <!-- Data Layer -->
+    <div class="arch-layer">
+      <span class="layer-label ll-data">Layer 4 — Data</span>
+      <div class="arch-row">
+        <div class="arch-box"><div class="arch-box-title">🐘 PostgreSQL (Primary DB)</div><div class="arch-box-desc">Multi-tenant database with RLS. All employee, payroll, TDS, SSF data. Automatic read replicas for reports.</div><div class="arch-box-tags"><span class="atag at-green">PostgreSQL 15</span><span class="atag at-cyan">RLS</span><span class="atag at-violet">Read replica</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">⚡ Redis (Cache + Queue)</div><div class="arch-box-desc">Session store, API response cache, background job queues for PDF generation and email sending.</div><div class="arch-box-tags"><span class="atag at-cyan">Redis 7</span><span class="atag at-amber">Bull queue</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">📦 Object storage (S3)</div><div class="arch-box-desc">Payslip PDFs, employee documents, TDS certificates, company logos. CDN-served.</div><div class="arch-box-tags"><span class="atag at-amber">S3</span><span class="atag at-cyan">CloudFront CDN</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">📜 Audit log DB</div><div class="arch-box-desc">Immutable compliance audit trail — who ran payroll, when, what changed. Required for IRD audit.</div><div class="arch-box-tags"><span class="atag at-red">Immutable</span><span class="atag at-green">IRD audit</span></div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓</div>
+    <div class="arch-arrow-label">External integrations</div>
+
+    <!-- External -->
+    <div class="arch-layer">
+      <span class="layer-label ll-external">Layer 5 — External Integrations</span>
+      <div class="arch-row">
+        <div class="arch-box"><div class="arch-box-title">🏛️ Nepal IRD</div><div class="arch-box-desc">e-TDS monthly filing, annual TDS submission, Kha 7 generation.</div><div class="arch-box-tags"><span class="atag at-red">e-TDS API</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🛡️ SSF Online</div><div class="arch-box-desc">SSF contribution upload, employee enrollment, statement download.</div><div class="arch-box-tags"><span class="atag at-green">SSF API</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🏦 Bank gateway</div><div class="arch-box-desc">NCHL bulk salary transfer, eSewa, Khalti disbursement APIs.</div><div class="arch-box-tags"><span class="atag at-cyan">NCHL</span><span class="atag at-amber">eSewa</span></div></div>
+        <div class="arch-box"><div class="arch-box-title">🖐️ Biometric devices</div><div class="arch-box-desc">ZKTeco, Suprema attendance data import via API or file upload.</div><div class="arch-box-tags"><span class="atag at-violet">ZKTeco</span><span class="atag at-cyan">Suprema</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MULTI-TENANCY -->
+<div class="panel" id="tab-multitenant">
+  <div class="diagram-wrap">
+    <div class="diagram-title">Multi-Tenant Data Architecture</div>
+    <div class="diagram-sub">Single PostgreSQL database serving all client companies using Row-Level Security (RLS). Each row carries a tenant_id — queries are auto-filtered so Company A can never see Company B's data.</div>
+
+    <div class="mt-wrap">
+      <div class="mt-row">
+        <div class="mt-box" style="border-color:rgba(124,58,237,.3)"><div class="mt-box-title" style="color:#A78BFA">🏢 Company A</div><div class="mt-box-sub">TechCo Nepal</div></div>
+        <div class="mt-arrow">·</div>
+        <div class="mt-box" style="border-color:rgba(6,182,212,.3)"><div class="mt-box-title" style="color:#67E8F9">🏢 Company B</div><div class="mt-box-sub">Himalaya Traders</div></div>
+        <div class="mt-arrow">·</div>
+        <div class="mt-box" style="border-color:rgba(16,185,129,.3)"><div class="mt-box-title" style="color:#34D399">🏢 Company C</div><div class="mt-box-sub">Summit Group</div></div>
+        <div class="mt-arrow">·</div>
+        <div class="mt-box" style="border-color:rgba(245,158,11,.3)"><div class="mt-box-title" style="color:#FCD34D">🏢 Company N</div><div class="mt-box-sub">...47 companies</div></div>
+      </div>
+
+      <div class="mt-arrow-down">↓ All requests pass through ↓</div>
+
+      <div style="max-width:480px;margin:0 auto 16px">
+        <div style="background:linear-gradient(135deg,rgba(6,182,212,.08),rgba(103,232,249,.04));border:1px solid rgba(6,182,212,.3);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--cyan2);margin-bottom:4px">🔀 API Gateway + Auth middleware</div>
+          <div style="font-size:11px;color:var(--text3)">Extracts tenant_id from JWT token → injects into every DB query</div>
+          <div style="margin-top:8px"><span class="atag at-cyan" style="font-size:10px;padding:3px 10px">SET app.current_tenant = 'techco_nepal'</span></div>
+        </div>
+      </div>
+
+      <div class="mt-arrow-down">↓</div>
+
+      <div class="mt-db-main">
+        <div class="mt-db-title">🐘 PostgreSQL — Shared Database</div>
+        <div class="mt-db-sub">Row-Level Security (RLS) automatically filters every query by tenant_id<br>No developer error can expose cross-tenant data</div>
+        <div class="rls-badge">CREATE POLICY tenant_isolation ON employees USING (tenant_id = current_setting('app.current_tenant'))</div>
+        <div class="mt-tenants" style="margin-top:16px">
+          <div class="mt-tenant" style="border-color:rgba(124,58,237,.3)"><div class="mt-tenant-name" style="color:#A78BFA">Tenant A rows</div><div class="mt-tenant-sub">employees, payroll, TDS, SSF</div></div>
+          <div class="mt-tenant" style="border-color:rgba(6,182,212,.3)"><div class="mt-tenant-name" style="color:#67E8F9">Tenant B rows</div><div class="mt-tenant-sub">employees, payroll, TDS, SSF</div></div>
+          <div class="mt-tenant" style="border-color:rgba(16,185,129,.3)"><div class="mt-tenant-name" style="color:#34D399">Tenant C rows</div><div class="mt-tenant-sub">employees, payroll, TDS, SSF</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text)">Database schema — key tables</div>
+      <div class="code-block"><pre><span class="kw-comment">-- Every table has tenant_id + RLS policy</span>
+<span class="kw-type">CREATE TABLE</span> employees (
+  id          <span class="kw-type">UUID</span> <span class="kw-key">PRIMARY KEY</span>,
+  tenant_id   <span class="kw-type">UUID</span> <span class="kw-key">NOT NULL REFERENCES</span> tenants(id),
+  name        <span class="kw-type">VARCHAR(200)</span> <span class="kw-key">NOT NULL</span>,
+  pan         <span class="kw-type">VARCHAR(20)</span>,
+  ssf_no      <span class="kw-type">VARCHAR(30)</span>,
+  basic_salary <span class="kw-type">NUMERIC(12,2)</span>,
+  department  <span class="kw-type">VARCHAR(100)</span>,
+  joined_date_bs <span class="kw-type">DATE</span>,
+  status      <span class="kw-type">VARCHAR(20)</span> <span class="kw-key">DEFAULT</span> <span class="kw-string">'active'</span>,
+  created_at  <span class="kw-type">TIMESTAMPTZ</span> <span class="kw-key">DEFAULT NOW()</span>
+);
+
+<span class="kw-comment">-- RLS policy — auto-filters every query</span>
+<span class="kw-type">ALTER TABLE</span> employees <span class="kw-key">ENABLE ROW LEVEL SECURITY</span>;
+<span class="kw-type">CREATE POLICY</span> tenant_isolation <span class="kw-key">ON</span> employees
+  <span class="kw-key">USING</span> (tenant_id = current_setting(<span class="kw-string">'app.current_tenant'</span>)::UUID);
+
+<span class="kw-comment">-- Payroll table</span>
+<span class="kw-type">CREATE TABLE</span> payroll_runs (
+  id          <span class="kw-type">UUID</span> <span class="kw-key">PRIMARY KEY</span>,
+  tenant_id   <span class="kw-type">UUID</span> <span class="kw-key">NOT NULL</span>,
+  month_bs    <span class="kw-type">VARCHAR(7)</span>,   <span class="kw-comment">-- e.g. '2081-12'</span>
+  total_gross <span class="kw-type">NUMERIC(15,2)</span>,
+  total_tds   <span class="kw-type">NUMERIC(15,2)</span>,
+  total_ssf   <span class="kw-type">NUMERIC(15,2)</span>,
+  total_net   <span class="kw-type">NUMERIC(15,2)</span>,
+  status      <span class="kw-type">VARCHAR(20)</span>,
+  run_by      <span class="kw-type">UUID REFERENCES</span> users(id),
+  run_at      <span class="kw-type">TIMESTAMPTZ</span>
+);</pre></div>
+    </div>
+  </div>
+</div>
+
+<!-- API FLOW -->
+<div class="panel" id="tab-apiflow">
+  <div class="diagram-wrap">
+    <div class="diagram-title">API Request Flow — Run Payroll</div>
+    <div class="diagram-sub">How a POST /v2/payroll/run request flows through the Mercury Payroll system from client to database and back.</div>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="flow-circle fc-client">🌐</div><div class="flow-title">Client sends request</div><div class="flow-desc">POST /v2/payroll/run with JWT token + payload</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-circle fc-gateway">🔀</div><div class="flow-title">API Gateway</div><div class="flow-desc">Rate limit check, SSL termination, request logging</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-circle fc-auth">🔐</div><div class="flow-title">Auth middleware</div><div class="flow-desc">Verify JWT, extract tenant_id, check RBAC permissions</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-circle fc-service">⚙️</div><div class="flow-title">Payroll engine</div><div class="flow-desc">Calculate salary, TDS, SSF, PF per Nepal rules</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-circle fc-db">🐘</div><div class="flow-title">PostgreSQL + RLS</div><div class="flow-desc">Write payroll records, filtered by tenant_id via RLS</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-circle fc-service">📬</div><div class="flow-title">Queue jobs</div><div class="flow-desc">Push PDF generation + email sending to Redis queue</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-circle fc-response">✅</div><div class="flow-title">Response</div><div class="flow-desc">Return payroll summary JSON in &lt;200ms</div></div>
+    </div>
+    <div style="margin-top:20px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px">Sample request &amp; response</div>
+      <div class="code-block"><pre><span class="kw-comment"># Request</span>
+POST /v2/payroll/run
+Authorization: Bearer mp_live_xxx
+X-Tenant-ID: techco_nepal
+{
+  <span class="kw-key">"month_bs"</span>: <span class="kw-string">"2081-12"</span>,
+  <span class="kw-key">"department"</span>: <span class="kw-string">"all"</span>,
+  <span class="kw-key">"dry_run"</span>: <span class="kw-key">false</span>
+}
+
+<span class="kw-comment"># Response (200ms avg)</span>
+{
+  <span class="kw-key">"payroll_id"</span>: <span class="kw-string">"pr_2081_12_techco"</span>,
+  <span class="kw-key">"employees_processed"</span>: <span class="num">248</span>,
+  <span class="kw-key">"total_gross"</span>: <span class="kw-num">38400000</span>,
+  <span class="kw-key">"total_tds"</span>: <span class="kw-num">4100000</span>,
+  <span class="kw-key">"total_ssf"</span>: <span class="kw-num">1920000</span>,
+  <span class="kw-key">"total_net"</span>: <span class="kw-num">32380000</span>,
+  <span class="kw-key">"status"</span>: <span class="kw-string">"completed"</span>,
+  <span class="kw-key">"payslips_queued"</span>: <span class="kw-num">248</span>,
+  <span class="kw-key">"emails_queued"</span>: <span class="kw-num">248</span>
+}</pre></div>
+    </div>
+  </div>
+</div>
+
+<!-- TECH STACK -->
+<div class="panel" id="tab-stack">
+  <div class="diagram-wrap">
+    <div class="diagram-title">Recommended Tech Stack</div>
+    <div class="diagram-sub">Production-ready stack for Mercury Payroll SaaS — optimised for Nepal's infrastructure and developer availability.</div>
+    <div class="stack-grid">
+      <div class="stack-card"><div class="stack-icon">🟩</div><div class="stack-name">Node.js + Express</div><div class="stack-role">Backend runtime</div><div class="stack-desc">Fast, event-driven. Large Nepal developer pool. Used for all microservices. TypeScript recommended.</div></div>
+      <div class="stack-card"><div class="stack-icon">🐘</div><div class="stack-name">PostgreSQL 15</div><div class="stack-role">Primary database</div><div class="stack-desc">Row-Level Security for multi-tenancy. JSONB for flexible data. Excellent for financial data integrity.</div></div>
+      <div class="stack-card"><div class="stack-icon">⚡</div><div class="stack-name">Redis 7</div><div class="stack-role">Cache + Job queue</div><div class="stack-desc">Session storage, API caching, Bull queues for async PDF/email jobs. Sub-millisecond reads.</div></div>
+      <div class="stack-card"><div class="stack-icon">⚛️</div><div class="stack-name">React + Vite</div><div class="stack-role">Frontend SPA</div><div class="stack-desc">Component-based UI. Fast HMR with Vite. TailwindCSS for styling. React Query for API state.</div></div>
+      <div class="stack-card"><div class="stack-icon">🐳</div><div class="stack-name">Docker + Compose</div><div class="stack-role">Containerization</div><div class="stack-desc">Each microservice in its own container. Docker Compose for local dev. Kubernetes for production scale.</div></div>
+      <div class="stack-card"><div class="stack-icon">☁️</div><div class="stack-name">DigitalOcean / AWS</div><div class="stack-role">Cloud hosting</div><div class="stack-desc">DigitalOcean Droplets for budget-friendly start. AWS for enterprise scale. Singapore region for Nepal latency.</div></div>
+      <div class="stack-card"><div class="stack-icon">🔀</div><div class="stack-name">Nginx + Kong</div><div class="stack-role">API Gateway</div><div class="stack-desc">Nginx as reverse proxy, Kong for API management — rate limiting, auth, logging, routing.</div></div>
+      <div class="stack-card"><div class="stack-icon">📦</div><div class="stack-name">AWS S3 / DO Spaces</div><div class="stack-role">Object storage</div><div class="stack-desc">Payslip PDFs, documents, TDS certificates. CDN delivery via CloudFront. Automatic lifecycle policies.</div></div>
+      <div class="stack-card"><div class="stack-icon">📧</div><div class="stack-name">SendGrid + Sparrow</div><div class="stack-role">Notifications</div><div class="stack-desc">SendGrid for transactional email. Sparrow SMS Nepal for OTP and deadline reminders in Nepal.</div></div>
+    </div>
+    <div style="background:var(--bg3);border-radius:12px;padding:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:10px">Monthly hosting cost estimate (production)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="background:var(--bg2);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--cyan2)">$48</div><div style="font-size:10px;color:var(--text3)">2× App servers</div></div>
+        <div style="background:var(--bg2);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--green)">$30</div><div style="font-size:10px;color:var(--text3)">Managed PostgreSQL</div></div>
+        <div style="background:var(--bg2);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amber)">$15</div><div style="font-size:10px;color:var(--text3)">Redis cache</div></div>
+        <div style="background:var(--bg2);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--violet2)">~$100/mo</div><div style="font-size:10px;color:var(--text3)">Total starter infra</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECURITY -->
+<div class="panel" id="tab-security">
+  <div class="diagram-wrap">
+    <div class="diagram-title">Security Architecture</div>
+    <div class="diagram-sub">Enterprise-grade security — critical for financial payroll data handling PAN numbers, bank accounts, and salary information.</div>
+    <div class="security-grid">
+      <div class="sec-card"><div class="sec-icon">🔐</div><div class="sec-title">Authentication &amp; authorization</div><div class="sec-list"><div class="sec-item"><span class="sec-check">✓</span>JWT tokens with 24hr expiry + refresh tokens</div><div class="sec-item"><span class="sec-check">✓</span>Role-based access control (RBAC) — Admin, HR, Finance, Employee</div><div class="sec-item"><span class="sec-check">✓</span>Multi-factor authentication (TOTP/SMS OTP)</div><div class="sec-item"><span class="sec-check">✓</span>Session invalidation on password change</div><div class="sec-item"><span class="sec-check">✓</span>OAuth2 support for Google/Microsoft SSO</div></div></div>
+      <div class="sec-card"><div class="sec-icon">🏰</div><div class="sec-title">Data isolation (multi-tenancy)</div><div class="sec-list"><div class="sec-item"><span class="sec-check">✓</span>PostgreSQL Row-Level Security on all tables</div><div class="sec-item"><span class="sec-check">✓</span>tenant_id injected at middleware level — not trusting client</div><div class="sec-item"><span class="sec-check">✓</span>Separate Redis namespaces per tenant</div><div class="sec-item"><span class="sec-check">✓</span>S3 bucket policies restrict file access by tenant</div><div class="sec-item"><span class="sec-check">✓</span>Database backups encrypted per tenant</div></div></div>
+      <div class="sec-card"><div class="sec-icon">🔒</div><div class="sec-title">Data encryption</div><div class="sec-list"><div class="sec-item"><span class="sec-check">✓</span>TLS 1.3 for all data in transit</div><div class="sec-item"><span class="sec-check">✓</span>AES-256 encryption for PAN numbers at rest</div><div class="sec-item"><span class="sec-check">✓</span>Bank account numbers stored encrypted</div><div class="sec-item"><span class="sec-check">✓</span>Password hashing with bcrypt (cost factor 12)</div><div class="sec-item"><span class="sec-check">✓</span>Database encryption at rest (AWS RDS / DO)</div></div></div>
+      <div class="sec-card"><div class="sec-icon">🛡️</div><div class="sec-title">Nepal compliance &amp; audit</div><div class="sec-list"><div class="sec-item"><span class="sec-check">✓</span>Immutable audit log — every payroll action recorded</div><div class="sec-item"><span class="sec-check">✓</span>Who ran payroll, when, what changed — full history</div><div class="sec-item"><span class="sec-check">✓</span>IRD-compatible data retention (7 years)</div><div class="sec-item"><span class="sec-check">✓</span>GDPR-style data export and deletion per company</div><div class="sec-item"><span class="sec-check">✓</span>Rate limiting prevents brute-force attacks</div></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

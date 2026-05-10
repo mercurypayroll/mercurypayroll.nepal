@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercury Payroll — Hosting Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07060F;--bg2:#0F0B20;--bg3:#17133A;--surface:#1E1848;
+  --gold:#F5A623;--violet:#7C3AED;--violet2:#A78BFA;
+  --green:#10B981;--red:#EF4444;--blue:#3B82F6;--cyan:#06B6D4;
+  --text:#F0EEFF;--text2:#C4B5FD;--text3:#7B6FB8;
+  --border:rgba(124,58,237,0.2);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#F5A623,#FCD34D);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#07060F}
+.logo-text{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+a.back{font-size:12px;color:var(--text3);text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:7px;transition:all .2s}
+a.back:hover{color:var(--gold);border-color:rgba(245,166,35,.3)}
+.wrap{max-width:900px;margin:0 auto;padding:40px 24px}
+h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,#F5A623,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.subtitle{font-size:14px;color:var(--text3);margin-bottom:36px;line-height:1.6}
+.section-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin:32px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.method-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px}
+.method-badge{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;margin-bottom:10px}
+.mb-free{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)}
+.mb-easy{background:rgba(245,166,35,.15);color:#FCD34D;border:1px solid rgba(245,166,35,.3)}
+.mb-pro{background:rgba(124,58,237,.15);color:#A78BFA;border:1px solid rgba(124,58,237,.3)}
+.method-icon{font-size:28px;margin-bottom:10px;display:block}
+.method-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px}
+.method-desc{font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:14px}
+.steps{display:flex;flex-direction:column;gap:7px}
+.step{display:flex;gap:10px;font-size:12px;color:var(--text2);align-items:flex-start}
+.step-n{width:20px;height:20px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:1px}
+.code-block{background:#0D1117;border:1px solid var(--border);border-radius:10px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;overflow-x:auto;margin:10px 0;color:#ABB2BF}
+.code-block .cmd{color:#98C379}.code-block .cmt{color:#5C6370;font-style:italic}.code-block .url{color:#61AFEF}.code-block .kw{color:#E06C75}.code-block .str{color:#98C379}
+.info-box{background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.2);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:13px;color:#67E8F9;line-height:1.7}
+.warn-box{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:13px;color:#FCD34D;line-height:1.7}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.feature-item{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:12px;display:flex;align-items:flex-start;gap:10px}
+.fi-icon{font-size:18px;flex-shrink:0}
+.fi-text p{font-size:12px;font-weight:600;color:var(--text)}
+.fi-text span{font-size:11px;color:var(--text3);line-height:1.5}
+.file-list{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0}
+.file-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px}
+.file-item:last-child{border-bottom:none}
+.file-icon{font-size:14px;width:22px;text-align:center}
+.file-name{font-family:'JetBrains Mono',monospace;color:var(--violet2);flex:1}
+.file-desc{color:var(--text3);font-size:11px}
+.domain-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.domain-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.domain-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.domain-price{font-size:13px;color:var(--gold);font-weight:600}
+.domain-url{font-size:10px;color:var(--text3);margin-top:4px}
+.checklist{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.check-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);padding:8px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)}
+.check-item.done::before{content:'✅';font-size:14px}
+.check-item.todo::before{content:'⬜';font-size:14px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo"><div class="logo-mark">M</div><span class="logo-text">Mercury Payroll — Hosting Guide</span></div>
+  <a href="../index.html" class="back">← Back to home</a>
+</div>
+<div class="wrap">
+  <h1>🚀 Hosting Guide</h1>
+  <p class="subtitle">Everything you need to get Mercury Payroll live online — from free static hosting to full production VPS deployment. Follow the steps below from top to bottom.</p>
+
+  <div class="section-title">Step 1 — Choose your hosting method</div>
+  <div class="method-grid">
+    <div class="method-card">
+      <span class="method-badge mb-free">FREE · 2 minutes</span>
+      <span class="method-icon">▲</span>
+      <div class="method-name">Vercel (Recommended)</div>
+      <div class="method-desc">Best for the HTML frontend. Free SSL, CDN, and custom domain. No server needed.</div>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div>Go to vercel.com — sign up free</div>
+        <div class="step"><div class="step-n">2</div>Click "Add New Project"</div>
+        <div class="step"><div class="step-n">3</div>Drag & drop the mercury-payroll folder</div>
+        <div class="step"><div class="step-n">4</div>Click Deploy — done in 60 seconds</div>
+        <div class="step"><div class="step-n">5</div>Add your .com.np domain in settings</div>
+      </div>
+    </div>
+    <div class="method-card">
+      <span class="method-badge mb-easy">FREE · GitHub</span>
+      <span class="method-icon">🐙</span>
+      <div class="method-name">GitHub Pages</div>
+      <div class="method-desc">Host directly from GitHub. Great for version control and collaboration.</div>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div>Create account at github.com</div>
+        <div class="step"><div class="step-n">2</div>New repository → upload files</div>
+        <div class="step"><div class="step-n">3</div>Settings → Pages → main branch</div>
+        <div class="step"><div class="step-n">4</div>Live at yourusername.github.io/mercury</div>
+        <div class="step"><div class="step-n">5</div>Connect .com.np domain in DNS</div>
+      </div>
+    </div>
+    <div class="method-card">
+      <span class="method-badge mb-pro">PRO · Full stack</span>
+      <span class="method-icon">🖥️</span>
+      <div class="method-name">VPS / DigitalOcean</div>
+      <div class="method-desc">For full backend with real database, payroll engine, and payment APIs.</div>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div>Get droplet at digitalocean.com (~$6/mo)</div>
+        <div class="step"><div class="step-n">2</div>Install Node.js, PostgreSQL, Nginx</div>
+        <div class="step"><div class="step-n">3</div>Upload files via Git or FTP</div>
+        <div class="step"><div class="step-n">4</div>Point domain DNS to server IP</div>
+        <div class="step"><div class="step-n">5</div>Install free SSL via Let's Encrypt</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Step 2 — Deploy with Vercel (quickest path)</div>
+  <div class="info-box">💡 This gets your Mercury Payroll site live in under 2 minutes — no coding required. Just drag, drop, deploy.</div>
+
+  <p style="font-size:13px;color:var(--text3);margin-bottom:8px">Option A — Via Vercel website (no coding needed)</p>
+  <div class="code-block">
+1. Open: <span class="url">https://vercel.com</span>
+2. Click "Sign Up" → use Google or GitHub account
+3. Click "Add New..." → "Project"
+4. Click "Browse" → select your <span class="str">mercury-payroll</span> folder
+5. Leave all settings as default → click <span class="cmd">Deploy</span>
+6. ✅ Your site is live at: <span class="url">https://mercury-payroll-xyz.vercel.app</span>
+  </div>
+
+  <p style="font-size:13px;color:var(--text3);margin-bottom:8px;margin-top:16px">Option B — Via Vercel CLI (terminal)</p>
+  <div class="code-block"><span class="cmt"># Install Node.js first from: https://nodejs.org</span>
+<span class="cmt"># Then open terminal / command prompt:</span>
+
+<span class="cmd">npm install -g vercel</span>          <span class="cmt"># Install Vercel CLI once</span>
+<span class="cmd">cd mercury-payroll</span>             <span class="cmt"># Go to your project folder</span>
+<span class="cmd">vercel</span>                          <span class="cmt"># Login with email → confirm → deploy</span>
+
+<span class="cmt"># Output:</span>
+<span class="cmt"># ✅ Deployed to: https://mercury-payroll.vercel.app</span>
+  </div>
+
+  <div class="section-title">Step 3 — Get a Nepal (.com.np) domain</div>
+  <div class="domain-grid">
+    <div class="domain-card">
+      <div class="domain-name">Mercantile</div>
+      <div class="domain-price">NRs 1,500/year</div>
+      <div class="domain-url">register.com.np</div>
+    </div>
+    <div class="domain-card">
+      <div class="domain-name">WebHost Nepal</div>
+      <div class="domain-price">NRs 1,200/year</div>
+      <div class="domain-url">webhostnepal.com</div>
+    </div>
+    <div class="domain-card">
+      <div class="domain-name">MOS Nepal</div>
+      <div class="domain-price">NRs 1,800/year</div>
+      <div class="domain-url">mos.com.np</div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:var(--text3);margin-bottom:8px">After buying domain, add these DNS records at your registrar:</p>
+  <div class="code-block"><span class="cmt"># For Vercel hosting — add these DNS records:</span>
+Type    Name    Value
+<span class="kw">A</span>       @       76.76.21.21
+<span class="kw">CNAME</span>   www     cname.vercel-dns.com
+
+<span class="cmt"># For GitHub Pages — add these DNS records:</span>
+Type    Name    Value
+<span class="kw">A</span>       @       185.199.108.153
+<span class="kw">A</span>       @       185.199.109.153
+<span class="kw">CNAME</span>   www     yourusername.github.io
+  </div>
+  <p style="font-size:12px;color:var(--text3);margin-top:8px">⏱️ DNS changes take 1–24 hours to propagate across Nepal ISPs.</p>
+
+  <div class="section-title">Step 4 — Your project file structure</div>
+  <p style="font-size:13px;color:var(--text3);margin-bottom:8px">Keep all files in this structure — don't rename or move them:</p>
+  <div class="file-list">
+    <div class="file-item"><span class="file-icon">📁</span><span class="file-name">mercury-payroll/</span><span class="file-desc">Root folder</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;index.html</span><span class="file-desc">Home page — start here</span></div>
+    <div class="file-item"><span class="file-icon">📁</span><span class="file-name">&nbsp;&nbsp;modules/</span><span class="file-desc">All 12 software modules</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;payroll-software.html</span><span class="file-desc">Core payroll dashboard</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;landing-website.html</span><span class="file-desc">Marketing site</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;saas-dashboard.html</span><span class="file-desc">Super admin panel</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;tds-wizard.html</span><span class="file-desc">TDS calculator</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;attendance-import.html</span><span class="file-desc">Biometric import</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;onboarding.html</span><span class="file-desc">Company setup wizard</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;payslip-generator.html</span><span class="file-desc">Bulk payslip + email</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;employee-portal.html</span><span class="file-desc">Employee self-service</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;mobile-app.html</span><span class="file-desc">Mobile UI screens</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;api-docs.html</span><span class="file-desc">REST API documentation</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;payment-gateway.html</span><span class="file-desc">eSewa · Khalti · Banks</span></div>
+    <div class="file-item"><span class="file-icon">📄</span><span class="file-name">&nbsp;&nbsp;&nbsp;&nbsp;hosting-guide.html</span><span class="file-desc">This file</span></div>
+  </div>
+
+  <div class="section-title">Step 5 — Adding features later</div>
+  <div class="feature-grid">
+    <div class="feature-item"><div class="fi-icon">➕</div><div class="fi-text"><p>New module</p><span>Create a new .html file in /modules, add a nav link in index.html</span></div></div>
+    <div class="feature-item"><div class="fi-icon">🎨</div><div class="fi-text"><p>Change colours</p><span>Edit :root CSS variables at the top of any file — 5 seconds</span></div></div>
+    <div class="feature-item"><div class="fi-icon">📊</div><div class="fi-text"><p>New tax slab</p><span>Find the slabs[] array in tds-wizard.html and update numbers</span></div></div>
+    <div class="feature-item"><div class="fi-icon">💳</div><div class="fi-text"><p>New payment gateway</p><span>Copy a tab in payment-gateway.html, rename, update API code</span></div></div>
+    <div class="feature-item"><div class="fi-icon">🏦</div><div class="fi-text"><p>New bank</p><span>Add a new .bank-item div in the bank grid section</span></div></div>
+    <div class="feature-item"><div class="fi-icon">👤</div><div class="fi-text"><p>New employee field</p><span>Add a .form-group div to the employee form in payroll-software.html</span></div></div>
+    <div class="feature-item"><div class="fi-icon">🌐</div><div class="fi-text"><p>Real backend</p><span>Connect forms to Node.js/Express API — replace static data with fetch() calls</span></div></div>
+    <div class="feature-item"><div class="fi-icon">🔁</div><div class="fi-text"><p>Re-deploy</p><span>After any change: run vercel again or push to GitHub — auto-deploys in 30s</span></div></div>
+  </div>
+
+  <div class="section-title">Step 6 — Pre-launch checklist</div>
+  <div class="checklist">
+    <div class="check-item todo">Buy mercurypayroll.com.np domain</div>
+    <div class="check-item todo">Deploy to Vercel or GitHub Pages</div>
+    <div class="check-item todo">Connect your .com.np domain</div>
+    <div class="check-item todo">Test all 12 modules in browser</div>
+    <div class="check-item todo">Update company name, PAN, address in HTML files</div>
+    <div class="check-item todo">Add real eSewa & Khalti merchant credentials</div>
+    <div class="check-item todo">Set up contact email (hello@mercurypayroll.com.np)</div>
+    <div class="check-item todo">Register at IRD for TDS filing credentials</div>
+    <div class="check-item todo">Test on mobile browser (Chrome on Android)</div>
+    <div class="check-item todo">Share with first beta client company</div>
+  </div>
+
+  <div class="warn-box">⚠️ <strong>Important:</strong> This is a frontend prototype. To process real salaries and store employee data securely, you will need a backend (Node.js + PostgreSQL). Contact a Nepal-based developer or ask Claude to help you build the backend API layer.</div>
+
+  <div style="text-align:center;margin-top:40px;padding:24px;background:var(--bg2);border-radius:14px;border:1px solid var(--border)">
+    <div style="font-size:28px;margin-bottom:10px">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px">You're ready to launch!</div>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:16px">Mercury Payroll Pvt. Ltd. — Built for Nepal 🇳🇵</p>
+    <a href="../index.html" style="display:inline-block;padding:10px 24px;background:linear-gradient(135deg,#F5A623,#FCD34D);color:#07060F;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none">← Back to all modules</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercury Payroll — Payment Gateway</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#07060F;--bg2:#0C0B18;--bg3:#121020;--surface:#181628;--esewa:#60BB46;--khalti:#5C2D91;--khalti2:#8B5CF6;--green:#10B981;--red:#EF4444;--amber:#F59E0B;--blue:#3B82F6;--gold:#F5A623;--text:#F0ECFF;--text2:#B8B0E8;--text3:#6B639A;--border:rgba(139,92,246,0.15);--border2:rgba(139,92,246,0.35)}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px}
+.page-header{text-align:center;margin-bottom:28px}
+.page-header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#60BB46,#8B5CF6,#F5A623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.page-header p{font-size:13px;color:var(--text3)}
+.main-tabs{display:flex;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.main-tab{flex:1;padding:12px 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text3);transition:all .2s;text-align:center;border-right:1px solid var(--border)}
+.main-tab:last-child{border-right:none}
+.main-tab.active{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(92,45,145,.1));color:var(--text);border-bottom:2px solid var(--khalti2)}
+.main-tab:hover:not(.active){background:var(--surface);color:var(--text2)}
+.tab-icon{font-size:16px;display:block;margin-bottom:3px}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.gw-card{border-radius:14px;padding:20px;border:2px solid transparent;cursor:pointer;transition:all .25s}
+.gw-esewa{background:linear-gradient(135deg,rgba(96,187,70,.08),var(--bg3));border-color:rgba(96,187,70,.25)}
+.gw-esewa:hover,.gw-esewa.selected{border-color:var(--esewa);box-shadow:0 0 0 3px rgba(96,187,70,.12)}
+.gw-khalti{background:linear-gradient(135deg,rgba(92,45,145,.1),var(--bg3));border-color:rgba(92,45,145,.3)}
+.gw-khalti:hover,.gw-khalti.selected{border-color:var(--khalti2);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
+.gw-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:4px}
+.gw-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:12px}
+.gw-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.gtag{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--border);color:var(--text3)}
+.gw-status{display:flex;align-items:center;gap:6px;font-size:11px}
+.status-dot{width:7px;height:7px;border-radius:50%}.sd-green{background:var(--green)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.b-green{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.3)}
+.b-amber{background:rgba(245,158,11,.15);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.b-blue{background:rgba(59,130,246,.15);color:#93C5FD;border:1px solid rgba(59,130,246,.3)}
+.b-violet{background:rgba(139,92,246,.15);color:#C4B5FD;border:1px solid rgba(139,92,246,.3)}
+.b-red{background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3)}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:10px;font-weight:600;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--khalti2)}
+.form-group select option{background:var(--bg2)}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:9px 20px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-esewa{background:linear-gradient(135deg,#4CAF3A,#60BB46);color:#fff}
+.btn-esewa:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(96,187,70,.3)}
+.btn-khalti{background:linear-gradient(135deg,#5C2D91,#8B5CF6);color:#fff}
+.btn-khalti:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(92,45,145,.3)}
+.btn-bank{background:linear-gradient(135deg,#1D4ED8,#3B82F6);color:#fff}
+.btn-bank:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,.3)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline:hover{background:var(--surface)}
+.code-block{background:#0D1017;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;overflow-x:auto;margin-bottom:12px;color:#ABB2BF}
+.code-block pre{white-space:pre-wrap}
+.kw-string{color:#98C379}.kw-num{color:#D19A66}.kw-key{color:#E06C75}.kw-comment{color:#5C6370;font-style:italic}
+.sum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sum-box{background:var(--surface);border-radius:9px;padding:12px;text-align:center}
+.sum-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.sum-lbl{font-size:9px;color:var(--text3);margin-top:3px}
+.otp-box{background:linear-gradient(135deg,rgba(92,45,145,.12),rgba(139,92,246,.06));border:1px solid rgba(139,92,246,.3);border-radius:12px;padding:20px;text-align:center;margin-bottom:14px}
+.otp-inputs{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.otp-input{width:38px;height:44px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;text-align:center;color:var(--text);font-size:18px;font-weight:700;font-family:'Syne',sans-serif;outline:none}
+.otp-input:focus{border-color:var(--khalti2)}
+.bank-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.bank-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .2s}
+.bank-item:hover,.bank-item.selected{border-color:var(--blue)}
+.bank-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.bank-info p{font-size:11px;font-weight:600;color:var(--text)}
+.bank-info span{font-size:9px;color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{background:var(--bg3);color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--surface)}
+td{padding:8px 10px;color:var(--text2)}
+td:first-child{color:var(--text);font-weight:500}
+.progress-bar{height:5px;background:var(--surface);border-radius:3px;overflow:hidden;margin:8px 0}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-header">
+    <h1>Mercury Payroll — Payment Gateway</h1>
+    <p>Nepal-first salary disbursement · eSewa · Khalti · Commercial Banks · NCHL</p>
+  </div>
+  <div class="main-tabs">
+    <div class="main-tab active" onclick="switchTab('overview',this)"><span class="tab-icon">🏦</span>Gateway Setup</div>
+    <div class="main-tab" onclick="switchTab('esewa',this)"><span class="tab-icon">🟢</span>eSewa</div>
+    <div class="main-tab" onclick="switchTab('khalti',this)"><span class="tab-icon">🟣</span>Khalti</div>
+    <div class="main-tab" onclick="switchTab('bank',this)"><span class="tab-icon">🏛️</span>Bank Transfer</div>
+    <div class="main-tab" onclick="switchTab('transactions',this)"><span class="tab-icon">📊</span>Transactions</div>
+  </div>
+
+  <div class="panel active" id="tab-overview">
+    <div class="sum-row">
+      <div class="sum-box"><div class="sum-val" style="color:var(--esewa)">NRs 12.4L</div><div class="sum-lbl">Via eSewa this month</div></div>
+      <div class="sum-box"><div class="sum-val" style="color:var(--khalti2)">NRs 8.1L</div><div class="sum-lbl">Via Khalti this month</div></div>
+      <div class="sum-box"><div class="sum-val" style="color:var(--blue)">NRs 32.4L</div><div class="sum-lbl">Via Bank transfer</div></div>
+      <div class="sum-box"><div class="sum-val" style="color:var(--green)">248</div><div class="sum-lbl">Employees paid</div></div>
+    </div>
+    <div class="grid2">
+      <div class="gw-card gw-esewa selected" id="gw-esewa" onclick="selectGW('esewa')">
+        <div style="font-size:28px;margin-bottom:10px">🟢</div>
+        <div class="gw-name" style="color:var(--esewa)">eSewa</div>
+        <div class="gw-desc">Nepal's leading digital wallet. Instant salary credit to employee eSewa wallets. No bank account required.</div>
+        <div class="gw-tags"><span class="gtag">Instant</span><span class="gtag">Wallet</span><span class="gtag">Mobile</span><span class="gtag">QR pay</span></div>
+        <div class="gw-status"><div class="status-dot sd-green"></div><span style="color:var(--green);font-weight:600">Connected</span><span class="badge b-green" style="margin-left:auto">Active</span></div>
+      </div>
+      <div class="gw-card gw-khalti" id="gw-khalti" onclick="selectGW('khalti')">
+        <div style="font-size:28px;margin-bottom:10px">🟣</div>
+        <div class="gw-name" style="color:var(--khalti2)">Khalti</div>
+        <div class="gw-desc">Fast digital payment platform with merchant &amp; P2P salary transfer. Competitive fees, instant settlement.</div>
+        <div class="gw-tags"><span class="gtag">Instant</span><span class="gtag">Wallet</span><span class="gtag">API</span><span class="gtag">Bulk pay</span></div>
+        <div class="gw-status"><div class="status-dot sd-green"></div><span style="color:var(--green);font-weight:600">Connected</span><span class="badge b-green" style="margin-left:auto">Active</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Commercial Bank Integrations</div>
+      <div class="bank-grid">
+        <div class="bank-item selected"><div class="bank-icon" style="background:rgba(220,20,60,.15)">🏦</div><div class="bank-info"><p>Nabil Bank</p><span>NCHL bulk · API</span></div></div>
+        <div class="bank-item selected"><div class="bank-icon" style="background:rgba(0,100,200,.15)">🏦</div><div class="bank-info"><p>NIC Asia Bank</p><span>NCHL bulk · API</span></div></div>
+        <div class="bank-item selected"><div class="bank-icon" style="background:rgba(0,150,100,.15)">🏦</div><div class="bank-info"><p>Everest Bank</p><span>NCHL bulk</span></div></div>
+        <div class="bank-item selected"><div class="bank-icon" style="background:rgba(200,150,0,.15)">🏦</div><div class="bank-info"><p>Global IME Bank</p><span>NCHL bulk</span></div></div>
+        <div class="bank-item selected"><div class="bank-icon" style="background:rgba(150,0,150,.15)">🏦</div><div class="bank-info"><p>Sanima Bank</p><span>NCHL bulk</span></div></div>
+        <div class="bank-item selected"><div class="bank-icon" style="background:rgba(0,80,160,.15)">🏦</div><div class="bank-info"><p>Standard Chartered</p><span>Swift · NCHL</span></div></div>
+        <div class="bank-item"><div class="bank-icon" style="background:rgba(100,100,100,.15)">🏦</div><div class="bank-info"><p>Rastriya Banijya</p><span>NCHL bulk</span></div></div>
+        <div class="bank-item"><div class="bank-icon" style="background:rgba(180,80,0,.15)">🏦</div><div class="bank-info"><p>Nepal Bank Ltd.</p><span>Manual · NCHL</span></div></div>
+        <div class="bank-item"><div class="bank-icon" style="background:rgba(0,180,180,.15)">+</div><div class="bank-info"><p>Add bank</p><span>25+ banks supported</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="tab-esewa">
+    <div class="card">
+      <div class="card-title"><span style="color:var(--esewa)">🟢 eSewa Integration Settings</span><span class="badge b-green">Live</span></div>
+      <div class="form-grid2">
+        <div class="form-group"><label>eSewa Merchant ID</label><input type="text" value="EPAYTEST"></div>
+        <div class="form-group"><label>Secret key</label><input type="password" value="8gBm/:&EnhH.1/q"></div>
+        <div class="form-group"><label>Environment</label><select><option>Production (Live)</option><option>UAT (Sandbox)</option></select></div>
+        <div class="form-group"><label>Callback URL</label><input type="text" value="https://api.mercurypayroll.com.np/webhooks/esewa"></div>
+      </div>
+      <button class="btn btn-esewa">Save eSewa settings</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Bulk salary disbursement via eSewa</div>
+      <div class="form-grid2" style="margin-bottom:12px">
+        <div class="form-group"><label>Payroll month</label><select><option>Chaitra 2081</option><option>Falgun 2081</option></select></div>
+        <div class="form-group"><label>Department</label><select><option>All departments</option><option>Technology</option></select></div>
+      </div>
+      <div style="background:rgba(96,187,70,.06);border:1px solid rgba(96,187,70,.2);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div style="text-align:center"><div style="font-family:'Syne',sans-serif;font-size:18px;color:var(--esewa);font-weight:700">62</div><div style="font-size:10px;color:var(--text3)">eSewa enrolled</div></div>
+          <div style="text-align:center"><div style="font-family:'Syne',sans-serif;font-size:18px;color:var(--green);font-weight:700">NRs 12.4L</div><div style="font-size:10px;color:var(--text3)">Total disbursement</div></div>
+          <div style="text-align:center"><div style="font-family:'Syne',sans-serif;font-size:18px;color:var(--amber);font-weight:700">0.3%</div><div style="font-size:10px;color:var(--text3)">Transaction fee</div></div>
+        </div>
+      </div>
+      <div class="code-block"><pre><span class="kw-comment"># eSewa bulk payment API</span>
+curl -X POST https://esewa.com.np/api/v2/bulk-payment \
+  -H <span class="kw-string">"Authorization: Bearer ESEWA_TOKEN"</span> \
+  -d '{
+    <span class="kw-key">"merchant_id"</span>: <span class="kw-string">"EPAYTEST"</span>,
+    <span class="kw-key">"payments"</span>: [
+      {
+        <span class="kw-key">"esewa_id"</span>: <span class="kw-string">"9841234567"</span>,
+        <span class="kw-key">"amount"</span>: <span class="kw-num">87100</span>,
+        <span class="kw-key">"remarks"</span>: <span class="kw-string">"Salary Chaitra 2081 - Aarav Sharma"</span>,
+        <span class="kw-key">"transaction_uuid"</span>: <span class="kw-string">"MPL-001-2081-12"</span>
+      }
+    ]
+  }'</pre></div>
+      <button class="btn btn-esewa" onclick="simulatePay('esewa')">🚀 Disburse via eSewa</button>
+      <div id="esewa-result" style="display:none;margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="tab-khalti">
+    <div class="card">
+      <div class="card-title"><span style="color:var(--khalti2)">🟣 Khalti Integration Settings</span><span class="badge b-violet">Live</span></div>
+      <div class="form-grid2">
+        <div class="form-group"><label>Khalti Public key</label><input type="text" value="test_public_key_dc74e0fd57cb46cd93832aee0a507256"></div>
+        <div class="form-group"><label>Khalti Secret key</label><input type="password" value="test_secret_key_59f36f..."></div>
+        <div class="form-group"><label>Environment</label><select><option>Production</option><option>Sandbox</option></select></div>
+        <div class="form-group"><label>Callback URL</label><input type="text" value="https://api.mercurypayroll.com.np/webhooks/khalti"></div>
+      </div>
+      <button class="btn btn-khalti">Save Khalti settings</button>
+    </div>
+    <div class="card">
+      <div class="card-title">OTP verification flow</div>
+      <div class="otp-box">
+        <div style="font-size:24px;margin-bottom:6px">🟣</div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:6px">Khalti OTP Verification</div>
+        <p style="font-size:12px;color:var(--text3)">Enter the 6-digit OTP sent to your mobile to confirm bulk salary disbursement of <strong style="color:var(--khalti2)">NRs 8,12,400</strong></p>
+        <div class="otp-inputs">
+          <input class="otp-input" type="text" maxlength="1" value="4">
+          <input class="otp-input" type="text" maxlength="1" value="8">
+          <input class="otp-input" type="text" maxlength="1" value="2">
+          <input class="otp-input" type="text" maxlength="1" value="">
+          <input class="otp-input" type="text" maxlength="1" value="">
+          <input class="otp-input" type="text" maxlength="1" value="">
+        </div>
+        <button class="btn btn-khalti" style="width:100%" onclick="simulatePay('khalti')">Verify &amp; Disburse</button>
+        <p style="font-size:11px;color:var(--text3);margin-top:8px">OTP expires in 4:32 · <span style="color:var(--khalti2);cursor:pointer">Resend OTP</span></p>
+      </div>
+      <div class="code-block"><pre><span class="kw-comment"># Khalti Disbursement API</span>
+curl -X POST https://khalti.com/api/v2/merchant/disburse/ \
+  -H <span class="kw-string">"Authorization: Key test_secret_key_59f36f"</span> \
+  -d '{
+    <span class="kw-key">"type"</span>: <span class="kw-string">"WALLET"</span>,
+    <span class="kw-key">"mobile"</span>: <span class="kw-string">"9841234567"</span>,
+    <span class="kw-key">"amount"</span>: <span class="kw-num">8710000</span>,
+    <span class="kw-key">"remarks"</span>: <span class="kw-string">"Salary Chaitra 2081"</span>
+  }'</pre></div>
+      <div id="khalti-result" style="display:none;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="tab-bank">
+    <div class="card">
+      <div class="card-title">Bank Transfer — NCHL Bulk Payment</div>
+      <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.7">
+        📋 Mercury Payroll integrates with <strong>NCHL (Nepal Clearing House Ltd.)</strong> for bulk inter-bank salary transfers. Generates bank-compatible ACH files or auto-submits via bank API. Supports all 28 commercial banks in Nepal.
+      </div>
+      <div class="form-grid2">
+        <div class="form-group"><label>Payer bank</label><select><option>Nabil Bank — Main A/C</option><option>NIC Asia Bank</option><option>Everest Bank</option></select></div>
+        <div class="form-group"><label>Payer account no.</label><input type="text" value="00901234567800"></div>
+        <div class="form-group"><label>Transfer date</label><input type="text" value="2082-01-02 (BS)"></div>
+        <div class="form-group"><label>File format</label><select><option>NCHL ACH format</option><option>Bank-specific CSV</option><option>Swift MT103</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+        <div style="background:var(--surface);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--blue)">186</div><div style="font-size:9px;color:var(--text3)">Bank transfers</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--green)">NRs 32.4L</div><div style="font-size:9px;color:var(--text3)">Total amount</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amber)">8</div><div style="font-size:9px;color:var(--text3)">Banks involved</div></div>
+        <div style="background:var(--surface);border-radius:8px;padding:10px;text-align:center"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text2)">NRs 500</div><div style="font-size:9px;color:var(--text3)">NCHL fee (flat)</div></div>
+      </div>
+      <div class="code-block"><pre><span class="kw-comment"># NCHL ACH file format (CSV)</span>
+<span class="kw-string">"TRN_NO","RECEIVER_BANK","ACCOUNT_NO","AMOUNT","REMARKS"</span>
+<span class="kw-string">"MPL0012081","Nabil Bank","00101234567","87100","Salary Chaitra 2081 MPL-001"</span>
+<span class="kw-string">"MPL0022081","NIC Asia","00901234567","74100","Salary Chaitra 2081 MPL-002"</span>
+<span class="kw-string">"MPL0032081","Everest Bank","01234567890","68400","Salary Chaitra 2081 MPL-003"</span></pre></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-bank" onclick="simulatePay('bank')">📤 Generate &amp; Submit NCHL file</button>
+        <button class="btn btn-outline">📥 Download ACH file</button>
+        <button class="btn btn-outline">📊 Preview transfers</button>
+      </div>
+      <div id="bank-result" style="display:none;margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="tab-transactions">
+    <div class="sum-row">
+      <div class="sum-box"><div class="sum-val" style="color:var(--green)">NRs 52.9L</div><div class="sum-lbl">Total disbursed</div></div>
+      <div class="sum-box"><div class="sum-val" style="color:var(--green)">246</div><div class="sum-lbl">Successful</div></div>
+      <div class="sum-box"><div class="sum-val" style="color:var(--red)">2</div><div class="sum-lbl">Failed</div></div>
+      <div class="sum-box"><div class="sum-val" style="color:var(--amber)">NRs 3,720</div><div class="sum-lbl">Total fees paid</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Transaction log — Chaitra 2081
+        <div style="display:flex;gap:6px">
+          <select style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text2);font-size:11px;outline:none"><option>All gateways</option><option>eSewa</option><option>Khalti</option><option>Bank</option></select>
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:11px">📥 Export</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Employee</th><th>Amount</th><th>Gateway</th><th>Txn ID</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Aarav Sharma</td><td>NRs 87,100</td><td><span class="badge b-green">eSewa</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">ESW-20820102-001</td><td>2 Baisakh 2082</td><td><span class="badge b-green">Success</span></td></tr>
+          <tr><td>Priya Thapa</td><td>NRs 74,100</td><td><span class="badge b-violet">Khalti</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">KHL-20820102-002</td><td>2 Baisakh 2082</td><td><span class="badge b-green">Success</span></td></tr>
+          <tr><td>Bikram Rai</td><td>NRs 68,400</td><td><span class="badge b-blue">Nabil Bank</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">NCHL-20820102-003</td><td>2 Baisakh 2082</td><td><span class="badge b-green">Success</span></td></tr>
+          <tr><td>Sita Gurung</td><td>NRs 46,400</td><td><span class="badge b-green">eSewa</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">ESW-20820102-004</td><td>2 Baisakh 2082</td><td><span class="badge b-red">Failed</span></td></tr>
+          <tr><td>Rohan Adhikari</td><td>NRs 35,100</td><td><span class="badge b-blue">NIC Asia</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">NCHL-20820102-005</td><td>2 Baisakh 2082</td><td><span class="badge b-green">Success</span></td></tr>
+          <tr><td>Anita Shrestha</td><td>NRs 95,440</td><td><span class="badge b-violet">Khalti</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px">KHL-20820102-006</td><td>2 Baisakh 2082</td><td><span class="badge b-green">Success</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.main-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function selectGW(id){
+  document.querySelectorAll('.gw-card').forEach(function(c){c.classList.remove('selected');});
+  document.getElementById('gw-'+id).classList.add('selected');
+}
+function simulatePay(gw){
+  var resultEl=document.getElementById(gw+'-result');
+  var colors={esewa:'rgba(96,187,70,.08)',khalti:'rgba(139,92,246,.08)',bank:'rgba(59,130,246,.08)'};
+  var textColors={esewa:'#60BB46',khalti:'#A78BFA',bank:'#60A5FA'};
+  var amounts={esewa:'NRs 12,43,200',khalti:'NRs 8,12,400',bank:'NRs 32,38,000'};
+  var counts={esewa:'62',khalti:'58',bank:'186'};
+  resultEl.style.display='block';
+  resultEl.innerHTML='<div style="background:'+colors[gw]+';border:1px solid '+textColors[gw]+'40;border-radius:10px;padding:14px"><div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-bottom:8px"><div id="pp-'+gw+'" style="height:100%;border-radius:3px;background:'+textColors[gw]+';width:0%;transition:width .4s"></div></div><p style="font-size:12px;color:'+textColors[gw]+';font-weight:600" id="ps-'+gw+'">Initiating payment...</p></div>';
+  var p=0;
+  var msgs=['Authenticating with gateway...','Validating employee accounts...','Processing bulk transfer...','Confirming transactions...','✅ Disbursement complete!'];
+  var i=0;
+  var iv=setInterval(function(){
+    p=Math.min(100,p+22);
+    document.getElementById('pp-'+gw).style.width=p+'%';
+    if(msgs[i])document.getElementById('ps-'+gw).textContent=msgs[i++];
+    if(p>=100){clearInterval(iv);document.getElementById('ps-'+gw).textContent='✅ '+amounts[gw]+' disbursed to '+counts[gw]+' employees successfully!';}
+  },500);
+}
+</script>
+</body>
+</html>
